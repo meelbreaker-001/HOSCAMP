@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/style.css?v=2.6">
+  <link rel="stylesheet" href="css/components.css?v=2.6">
+  <link rel="stylesheet" href="css/dashboard.css?v=2.6">
+  <link rel="stylesheet" href="css/chat.css?v=2.6">
+</head>
+<body>
+  <div id="test_results" style="position:fixed;bottom:0;left:0;background:#000;color:#0f0;padding:10px;z-index:99999;max-height:400px;overflow:auto;"></div>
+
+  <script src="js/auth.js?v=2.6"></script>
+  <script src="js/chat.js?v=2.6"></script>
+  <script src="js/student.js?v=2.6"></script>
+  <script src="js/warden.js?v=2.6"></script>
+  <script src="js/academic.js?v=2.6"></script>
+  <script src="js/security.js?v=2.6"></script>
+  <script src="js/admin.js?v=2.6"></script>
+  <script src="js/app.js?v=2.6"></script>
+
+  <script>
+    fetch('index.html?v=' + Date.now())
+      .then(r => r.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        document.body.innerHTML = doc.body.innerHTML + '<div id="test_results" style="position:fixed;bottom:0;left:0;background:#000;color:#0f0;padding:10px;z-index:99999;max-height:400px;overflow:auto;"></div>';
+
+        const logs = [];
+
+        // 1. TEST CHIEF WARDEN LOGIN VIA ROLE DROPDOWN
+        document.getElementById('loginRoleSelect').value = 'CHIEF_WARDEN';
+        document.getElementById('loginUsername').value = 'chiefwarden@adhiyamaan.ac.in';
+        document.getElementById('loginPassword').value = 'ace_cw_2026';
+        handleRealLogin(new Event('submit'));
+
+        let currentUser = getCurrentUser();
+        let dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+        let sidebar = document.getElementById('appSidebar').innerHTML;
+
+        logs.push({
+          test: 'Chief Warden Login via dropdown',
+          role: currentUser.role,
+          name: currentUser.fullName,
+          has_chief_warden_title: dashArea.includes('Supreme Governance Portal') || dashArea.includes('Chief Warden'),
+          sidebar_has_cw: sidebar.includes('Chief Warden'),
+          is_student_dash: dashArea.includes('Welcome back, Alex')
+        });
+
+        handleUserLogout();
+
+        // 2. TEST CHIEF WARDEN LOGIN VIA FUZZY STRING "chief warden" (WITH SPACE)
+        document.getElementById('loginRoleSelect').value = 'STUDENT'; // Left default on student!
+        document.getElementById('loginUsername').value = 'chief warden';
+        document.getElementById('loginPassword').value = 'any';
+        handleRealLogin(new Event('submit'));
+
+        currentUser = getCurrentUser();
+        dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+
+        logs.push({
+          test: 'Chief Warden Login via fuzzy "chief warden"',
+          role: currentUser.role,
+          name: currentUser.fullName,
+          has_cw_dashboard: dashArea.includes('Supreme Governance Portal') || dashArea.includes('Chief Warden'),
+          is_student_dash: dashArea.includes('Welcome back, Alex')
+        });
+
+        handleUserLogout();
+
+        // 3. TEST DEPUTY WARDEN COUNT CARD POPUPS
+        document.getElementById('loginRoleSelect').value = 'WARDEN';
+        document.getElementById('loginUsername').value = 'warden_block_b';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
+        // Test opening pending modal
+        openWardenCountModal('pending');
+        let modal = document.getElementById('wardenCountModal');
+        let modalTitle = document.getElementById('wardenCountModalTitle').innerText;
+        let modalBody = document.getElementById('wardenCountModalBody').innerHTML;
+
+        logs.push({
+          test: 'Warden Count Modal - Pending',
+          modal_active: modal.classList.contains('active'),
+          modal_title: modalTitle,
+          has_extension_badge: modalBody.includes('RETURN EXTENSION'),
+          has_approve_btn: modalBody.includes('Approve')
+        });
+
+        // Test opening outin modal
+        openWardenCountModal('outin');
+        logs.push({
+          test: 'Warden Count Modal - OUT/IN',
+          modal_active: modal.classList.contains('active'),
+          modal_title: document.getElementById('wardenCountModalTitle').innerText,
+          rows_count: document.getElementById('wardenCountModalBody').querySelectorAll('tbody tr').length
+        });
+
+        // Test opening roomstay modal
+        openWardenCountModal('roomstay');
+        logs.push({
+          test: 'Warden Count Modal - Room Stay',
+          modal_active: modal.classList.contains('active'),
+          modal_title: document.getElementById('wardenCountModalTitle').innerText,
+          rows_count: document.getElementById('wardenCountModalBody').querySelectorAll('tbody tr').length
+        });
+
+        // Test opening residents modal
+        openWardenCountModal('residents');
+        logs.push({
+          test: 'Warden Count Modal - Residents',
+          modal_active: modal.classList.contains('active'),
+          modal_title: document.getElementById('wardenCountModalTitle').innerText,
+          rows_count: document.getElementById('wardenCountModalBody').querySelectorAll('tbody tr').length
+        });
+
+        // 4. TEST STUDENT EXTENSION REQUEST & WARDEN APPROVAL
+        closeWardenCountModal();
+        handleUserLogout();
+
+        // Log in as student
+        document.getElementById('loginRoleSelect').value = 'STUDENT';
+        document.getElementById('loginUsername').value = 'alex_student';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
+        // Student submits extension
+        document.getElementById('extendPassId').value = 'PASS-2026-X89B';
+        document.getElementById('extendCurrentEndDate').value = '2026-09-21 18:00';
+        document.getElementById('extendNewEndDate').value = '2026-09-21 21:00';
+        document.getElementById('extendReason').value = 'Delayed campus bus service from Bangalore';
+        handleExtendPassSubmit(new Event('submit'));
+
+        const studentPass = window.sampleOutInPasses.find(p => p.id === 'PASS-2026-X89B');
+        logs.push({
+          test: 'Student Dispatches Return Time Extension',
+          extension_status: studentPass ? studentPass.extensionStatus : null
+        });
+
+        handleUserLogout();
+
+        // Deputy Warden logs in and approves extension
+        document.getElementById('loginRoleSelect').value = 'WARDEN';
+        document.getElementById('loginUsername').value = 'warden_block_b';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
+        // Find the extension in warden queue
+        const ext = sampleWardenPendingPasses.find(p => p.isExtension);
+        let approvedResult = false;
+        if (ext) {
+          approvePassExtension(ext.id);
+          approvedResult = true;
+        }
+
+        const issuedOutIn = sampleWardenIssuedOutInPasses.find(p => p.id === 'PASS-2026-X89B');
+        logs.push({
+          test: 'Warden Approves Extension',
+          ext_found_and_approved: approvedResult,
+          issued_end_date: issuedOutIn ? issuedOutIn.endDate : null,
+          issued_ext_status: issuedOutIn ? issuedOutIn.extensionStatus : null
+        });
+
+        document.getElementById('test_results').innerText = JSON.stringify(logs, null, 2);
+        document.body.setAttribute('data-test-completed', 'true');
+      });
+  </script>
+</body>
+</html>

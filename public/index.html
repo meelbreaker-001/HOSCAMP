@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hostel & Campus Connectivity Portal - Adhiyamaan College of Engineering</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- Application Styles -->
+  <link rel="stylesheet" href="css/style.css?v=2.6">
+  <link rel="stylesheet" href="css/components.css?v=2.6">
+  <link rel="stylesheet" href="css/dashboard.css?v=2.6">
+  <link rel="stylesheet" href="css/chat.css?v=2.6">
+</head>
+<body>
+
+  <!-- Navigation Bar with Official College Logo & Link -->
+  <header class="app-header">
+    <div class="brand-container">
+      <a href="https://adhiyamaan.ac.in/ace/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 0.85rem; text-decoration: none;">
+        <img src="https://adhiyamaan.ac.in/ace/images/logo33.gif" alt="Adhiyamaan College of Engineering Logo" style="height: 52px; width: auto; object-fit: contain; background: #FFFFFF; padding: 4px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+        <div>
+          <h1 class="brand-title">Hostel & Campus Portal</h1>
+          <div class="brand-subtitle">Adhiyamaan College of Engineering (Autonomous)</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-right" id="headerNavRight">
+      <!-- Default Landing View Nav Buttons -->
+      <button class="btn btn-primary" onclick="openLoginModal()">
+        🔑 Portal Login
+      </button>
+    </div>
+  </header>
+
+  <!-- Section A: Public Landing Page (Showcase Hostels & Facilities) -->
+  <div id="publicLandingView">
+    
+    <!-- Hero Banner -->
+    <section style="background: linear-gradient(135deg, rgba(30, 27, 75, 0.9), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80') center/cover; padding: 4rem 2rem; text-align: center; border-bottom: 1px solid var(--border-glass);">
+      <div style="max-width: 900px; margin: 0 auto;">
+        <span class="role-badge student" style="margin-bottom: 1rem;">Campus Life & Residential Facilities</span>
+        <h2 style="font-size: 2.5rem; font-weight: 800; margin: 1rem 0; background: linear-gradient(90deg, #FFFFFF, #CBD5E1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          Connecting Hostel Students, Wardens & Academic Departments
+        </h2>
+        <p style="font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
+          A unified, high-security digital portal for dual-approval leave passes, real-time grievance tracking with photo proof, 24/7 emergency SOS dispatch, and gate pass security scanning.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <button class="btn btn-primary" style="padding: 0.85rem 1.75rem; font-size: 1rem;" onclick="openLoginModal()">Access Portal Login</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Official Hostels Showcase Section -->
+    <section style="padding: 3rem 2rem; max-width: 1400px; margin: 0 auto;" id="hostels">
+      <div class="section-header" style="text-align: center; display: block; margin-bottom: 2rem;">
+        <h3 class="section-title" style="justify-content: center; font-size: 1.75rem;">🏛️ Adhiyamaan Campus Hostels</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem;">Official residential hostels providing comfortable accommodation for students</p>
+      </div>
+
+      <div class="grid-stats">
+        <div class="pass-card">
+          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🏢</div>
+          <h4 style="font-size: 1.2rem; font-weight: 700;">Pennar Hostel (Boys Hostel)</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.5;">
+            Official residential block for gents. Offers single, double, and 4-member sharing rooms, study halls, high-speed Wi-Fi, and Block Deputy Warden office.
+          </p>
+        </div>
+
+        <div class="pass-card">
+          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🌸</div>
+          <h4 style="font-size: 1.2rem; font-weight: 700;">Bhavani Hostel (Girls Hostel)</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.5;">
+            Official residential block for ladies. Gated perimeter security, 24/7 female warden presence, bio-metric access, and visitor lounge.
+          </p>
+        </div>
+
+        <div class="pass-card">
+          <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎓</div>
+          <h4 style="font-size: 1.2rem; font-weight: 700;">Cauvery Scholar Hostel</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.5;">
+            Residential accommodation for senior students, PG scholars, and research fellows equipped with LAN and quiet study spaces.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Facilities Section -->
+    <section style="padding: 3rem 2rem; background: rgba(15, 23, 42, 0.5); border-top: 1px solid var(--border-glass);" id="facilities">
+      <div style="max-width: 1400px; margin: 0 auto;">
+        <div class="section-header" style="text-align: center; display: block; margin-bottom: 2.5rem;">
+          <h3 class="section-title" style="justify-content: center; font-size: 1.75rem;">⚡ Residential Amenities & Services</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem;">Ensuring a safe, healthy, and connected campus environment</p>
+        </div>
+
+        <div class="grid-stats">
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Dining & Mess</div>
+              <div class="stat-value" style="font-size: 1.1rem; font-weight: 700; margin-top: 0.5rem;">Hygienic Veg/Non-Veg Meals</div>
+            </div>
+            <div class="stat-icon">🍲</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Connectivity</div>
+              <div class="stat-value" style="font-size: 1.1rem; font-weight: 700; margin-top: 0.5rem;">1 Gbps Campus Wi-Fi</div>
+            </div>
+            <div class="stat-icon">📡</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Health & Safety</div>
+              <div class="stat-value" style="font-size: 1.1rem; font-weight: 700; margin-top: 0.5rem;">24/7 Medical & Ambulance</div>
+            </div>
+            <div class="stat-icon">🚑</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-info">
+              <div class="stat-label">Gate Security</div>
+              <div class="stat-value" style="font-size: 1.1rem; font-weight: 700; margin-top: 0.5rem;">Pass Scanner Checkpoints</div>
+            </div>
+            <div class="stat-icon">👮</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Anti-Ragging Committee & Zero Tolerance Council Section -->
+    <section style="padding: 3rem 2rem; max-width: 1400px; margin: 0 auto; border-top: 1px solid var(--border-glass);" id="antiragging">
+      <div class="section-header" style="text-align: center; display: block; margin-bottom: 2rem;">
+        <span class="role-badge" style="background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); margin-bottom: 0.5rem; display: inline-block;">AICTE & UGC Statutory Directive</span>
+        <h3 class="section-title" style="justify-content: center; font-size: 1.75rem; color: #EF4444;">🛡️ Anti-Ragging Council & Zero-Tolerance Policy</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.4rem;">Adhiyamaan College of Engineering enforces a strict, zero-tolerance policy against any form of ragging on campus and inside residential hostels.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Council Composition Card -->
+        <div class="stat-card" style="display: block; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(30, 27, 75, 0.4);">
+          <h4 style="color: #F87171; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+            🏛️ Anti-Ragging Committee Heads
+          </h4>
+          <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.88rem; line-height: 1.8; color: var(--text-main);">
+            <li>👑 <b>Chairman:</b> Dr. G. Ranganath, Principal</li>
+            <li>🎓 <b>Dean (Academics):</b> Dr. Venkatesan Selvam</li>
+            <li>🔬 <b>HoD (Physics):</b> Prof. R. N. Jaya Prakash</li>
+            <li>📖 <b>HoD (English):</b> Prof. N. Uttham Kumar</li>
+            <li>🧪 <b>Faculty (Chemistry):</b> Prof. I. Inigo Babu</li>
+          </ul>
+        </div>
+
+        <!-- Hostel Wardens & Squad Card -->
+        <div class="stat-card" style="display: block; border: 1px solid rgba(245, 158, 11, 0.3); background: rgba(30, 27, 75, 0.4);">
+          <h4 style="color: #FBBF24; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+            🛡️ Hostel Anti-Ragging Squad
+          </h4>
+          <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.88rem; line-height: 1.8; color: var(--text-main);">
+            <li>🏢 <b>Chief Warden:</b> Central authority for all campus hostels</li>
+            <li>🛡️ <b>Deputy Warden (Boys):</b> Prof. M. Arjunan (Pennar Hostel)</li>
+            <li>🛡️ <b>Deputy Warden (Girls):</b> Prof. S. Aarthi (Bhavani Hostel)</li>
+            <li>🎓 <b>Student Representative:</b> Ms. Deepika Acharya (III B.E. Aero)</li>
+            <li>👮 <b>Campus Security:</b> Master Gate Security Patrol</li>
+          </ul>
+        </div>
+
+        <!-- 24/7 Helpline & Reporting Hotlines -->
+        <div class="stat-card" style="display: block; border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(30, 27, 75, 0.4);">
+          <h4 style="color: #34D399; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem;">
+            📞 24/7 Emergency Helplines
+          </h4>
+          <div style="font-size: 0.88rem; line-height: 1.8; color: var(--text-main);">
+            <div>🚨 <b>National Anti-Ragging Toll Free:</b> <a href="tel:18001805522" style="color: #38BDF8; font-weight: 700;">1800-180-5522</a></div>
+            <div>📧 <b>National Helpline Email:</b> <code style="color: #FBBF24;">helpline@antiragging.in</code></div>
+            <div>🏫 <b>ACE Campus Helpline:</b> <span style="color: #34D399; font-weight: 700;">04344-260570 / 261002</span></div>
+            <div>✉️ <b>Principal Direct:</b> <code style="color: #FBBF24;">principal@adhiyamaan.ac.in</code></div>
+            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">Confidential reporting is guaranteed for all students.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Section B: Authenticated App Body (Hidden until logged in) -->
+  <div class="app-body" id="authenticatedAppView" style="display: none;">
+
+    <!-- Sidebar Navigation with Dynamic Role-Based Items -->
+    <aside class="sidebar" id="appSidebar">
+      <!-- Populated dynamically per role by updateSidebarVisibility() -->
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="main-content">
+
+      <!-- Live Emergency SOS Flashing Banner -->
+      <div id="sosBannerContainer" style="display: none;">
+        <div class="sos-emergency-banner">
+          <div class="sos-banner-info">
+            <span class="sos-pulse-icon">🚨</span>
+            <div>
+              <div class="sos-banner-title">EMERGENCY SOS ALERT ACTIVE</div>
+              <div class="sos-banner-desc" id="sosBannerText">Student Alex Rivers (Room 304, Pennar Hostel Block B) triggered Medical Emergency SOS!</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" onclick="respondToSOS()">En Route / Respond</button>
+        </div>
+      </div>
+
+      <!-- Main Dynamic Dashboard Render Box -->
+      <div id="dashboardRenderArea">
+        <!-- Populated dynamically by JS -->
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Floating Chat Toggle Button (Visible when logged in) -->
+  <button class="chat-floating-toggle" id="floatingChatBtn" onclick="toggleChatDrawer()" title="Open 3-Channel Chat" style="display: none;">
+    💬
+    <span class="chat-badge-count" id="unreadChatBadge">2</span>
+  </button>
+
+  <!-- 3-Channel Sliding Chat Drawer -->
+  <div class="chat-drawer" id="chatDrawer">
+    <div class="chat-header">
+      <div class="chat-title">
+        <span>💬</span> Internal Messaging
+      </div>
+      <button class="btn-close-modal" onclick="toggleChatDrawer()">✕</button>
+    </div>
+
+    <!-- 3 Channel Navigation Tabs -->
+    <div class="chat-channels-nav">
+      <button class="chat-tab-btn active" id="tabChannelWardenChief" onclick="switchChatChannel('WARDEN_CHIEF')">Warden ↔ Admin</button>
+      <button class="chat-tab-btn" id="tabChannelStudentWarden" onclick="switchChatChannel('STUDENT_WARDEN')">Student ↔ Warden</button>
+      <button class="chat-tab-btn" id="tabChannelAcademicWarden" onclick="switchChatChannel('ACADEMIC_WARDEN')">Academic ↔ Warden</button>
+    </div>
+
+    <!-- Message Body -->
+    <div class="chat-messages-body" id="chatMessagesArea">
+      <!-- Populated dynamically by chat.js -->
+    </div>
+
+    <!-- Input Bar -->
+    <div class="chat-footer">
+      <input type="text" class="chat-input" id="chatInputField" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)">
+      <button class="btn btn-primary" onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
+
+  <!-- Real User Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Portal User Login</h3>
+        <button class="btn-close-modal" onclick="closeLoginModal()">✕</button>
+      </div>
+
+      <form onsubmit="handleRealLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Select Your Role</label>
+          <select class="form-control" id="loginRoleSelect" required>
+            <option value="CHIEF_WARDEN">👑 Chief Warden (All Campus Hostels Jurisdiction)</option>
+            <option value="ADMIN">🏛️ Principal / Supreme Head</option>
+            <option value="WARDEN">🛡️ Deputy Warden</option>
+            <option value="STUDENT">🎒 Student</option>
+            <option value="TUTOR">📚 Class Tutor</option>
+            <option value="HOD">🎓 Department HoD</option>
+            <option value="SECURITY">👮 Master Security</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.4rem;">⚡ Quick-Fill Credentials (1-Click Auto Fill):</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+            <button type="button" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem; border-color: rgba(99, 102, 241, 0.4);" onclick="quickFillLogin('CHIEF_WARDEN')">👑 Chief Warden</button>
+            <button type="button" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem; border-color: rgba(99, 102, 241, 0.4);" onclick="quickFillLogin('PRINCIPAL')">🏛️ Principal</button>
+            <button type="button" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem; border-color: rgba(16, 185, 129, 0.4);" onclick="quickFillLogin('WARDEN')">🛡️ Deputy Warden</button>
+            <button type="button" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;" onclick="quickFillLogin('STUDENT')">🎒 Student</button>
+            <button type="button" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;" onclick="quickFillLogin('TUTOR')">📚 Tutor</button>
+            <button type="button" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;" onclick="quickFillLogin('HOD')">🎓 HoD</button>
+            <button type="button" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;" onclick="quickFillLogin('SECURITY')">👮 Security</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Username / Roll No / Official ID</label>
+          <input type="text" class="form-control" id="loginUsername" placeholder="Enter your username" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; line-height: 1.6;">
+          💡 <b>Developer-Managed System Credentials:</b><br>
+          • 👑 <b>Principal:</b> <code>principal@adhiyamaan.ac.in</code> / <code>ace_principal_2026</code><br>
+          • 🏢 <b>Chief Warden (All Hostels):</b> <code>chiefwarden@adhiyamaan.ac.in</code> / <code>ace_cw_2026</code><br>
+          • 🛡️ <b>Deputy Warden:</b> <code>warden_block_b</code> / <code>pass123</code> (Pennar Boys)<br>
+          • 📚 <b>Class Tutor:</b> <code>tutor_cse_a</code> / <code>pass123</code><br>
+          • 🎓 <b>Department HoD:</b> <code>hod_cse</code> / <code>pass123</code><br>
+          • 👮 <b>Master Security:</b> <code>main_security</code> / <code>pass123</code><br>
+          • 🎒 <b>Student:</b> <code>alex_student</code> / <code>pass123</code>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In to Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dedicated Modal: Extend Pass Validity (OUT/IN Pass) -->
+  <div class="modal-overlay" id="extendPassModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">⏱️ Request Pass Validity Extension</h3>
+        <button class="btn-close-modal" onclick="closeExtendPassModal()">✕</button>
+      </div>
+      <form onsubmit="handleExtendPassSubmit(event)">
+        <input type="hidden" id="extendPassId">
+        <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.75rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.82rem; color: #FBBF24;">
+          ⏱️ <b>Pass Validity Extension:</b> Submit a revised return time. Extensions are strictly routed to your Deputy Warden for review and approval.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Current Scheduled Return Time</label>
+          <input type="text" class="form-control" id="extendCurrentEndDate" readonly style="background: rgba(255,255,255,0.05); color: var(--text-muted);">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Requested New Return Date & Time</label>
+          <input type="datetime-local" class="form-control" id="extendNewEndDate" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason for Extension</label>
+          <textarea class="form-control" id="extendReason" rows="3" placeholder="e.g. Train delayed by 2 hours, medical appointment rescheduled, unexpected emergency..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-warning" style="width: 100%; background: linear-gradient(135deg, #F59E0B, #D97706); color: #0F172A; font-weight: 800;">
+          Submit Extension Request to Deputy Warden
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dedicated Modal: Warden Review Security Violation Modal -->
+  <div class="modal-overlay" id="reviewSecurityViolationModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🚨 Review Security Incident & Enter Action</h3>
+        <button class="btn-close-modal" onclick="closeReviewSecurityModal()">✕</button>
+      </div>
+      <form onsubmit="handleSaveSecurityReview(event)">
+        <input type="hidden" id="reviewViolationId">
+        <div class="form-group">
+          <label class="form-label">Student & Incident Details</label>
+          <div id="reviewViolationDetailsBox" style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; color: var(--text-main); line-height: 1.5;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Warden Action Taken & Disciplinary Remarks</label>
+          <textarea class="form-control" id="reviewWardenResponse" rows="3" placeholder="e.g. Contacted parent, student given official warning, curfew reminder issued..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success" style="width: 100%;">
+          ✅ Mark Reviewed & Save 30-Day Disciplinary Record
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dedicated Modal 1: Apply OUT / IN Pass (Leaving Campus) -->
+  <div class="modal-overlay" id="applyLeaveModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Submit OUT / IN Pass Request</h3>
+        <button class="btn-close-modal" onclick="closeApplyLeaveModal()">✕</button>
+      </div>
+      <form onsubmit="handleLeaveSubmit(event)">
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.75rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.82rem; color: #34D399;">
+          🚪 <b>Campus Departure Pass:</b> Issued for leaving hostel/campus (Home visit, outing, hospital visit). Gate scanning required.
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Departure Date & Time</label>
+            <input type="datetime-local" class="form-control" id="leaveStartDate" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expected Return Date & Time</label>
+            <input type="datetime-local" class="form-control" id="leaveEndDate" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Destination Address</label>
+          <input type="text" class="form-control" id="leaveDestination" placeholder="e.g. Home, Hosur / Apollo City Hospital" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Parent / Guardian Contact Number</label>
+          <input type="tel" class="form-control" id="leaveParentContact" placeholder="+91 9876543210" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason for Leaving Campus</label>
+          <textarea class="form-control" id="leaveReason" rows="3" placeholder="Provide detailed reason..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit OUT / IN Pass Application</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dedicated Modal 2: Apply Room Stay Pass -->
+  <div class="modal-overlay" id="applyRoomStayModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🛏️ Submit Room Stay Pass</h3>
+        <button class="btn-close-modal" onclick="closeApplyRoomStayModal()">✕</button>
+      </div>
+      <form onsubmit="handleRoomStaySubmit(event)">
+        <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.75rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.82rem; color: #FBBF24;">
+          🛏️ <b>Room Stay Pass:</b> Grants permission to stay inside your assigned Hostel Room during class/college hours. Gate check-out is not required.
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Room Stay Start Date</label>
+            <input type="datetime-local" class="form-control" id="roomStayStartDate" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Room Stay End Date</label>
+            <input type="datetime-local" class="form-control" id="roomStayEndDate" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Room Stay Reason</label>
+          <select class="form-control" id="roomStayReasonType" required>
+            <option value="Medical / Sickness / Fever">🤒 Sickness / Medical Indisposition</option>
+            <option value="Exam / Test Study Preparation">📚 Exam / Study Preparation</option>
+            <option value="Physical Rest / Exhaustion">🛌 Physical Rest / Exhaustion</option>
+            <option value="Personal / Family Urgency">🏡 Personal / Family Urgency</option>
+            <option value="Academic Project Work">💻 Academic Project Work in Room</option>
+            <option value="Other Legitimate Reason">📌 Other Legitimate Reason</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason Details / Explanation</label>
+          <input type="text" class="form-control" id="roomStayIllness" placeholder="Provide details about your room stay reason..." required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Parent / Guardian Contact Number</label>
+          <input type="tel" class="form-control" id="roomStayParentContact" placeholder="+91 9876543210" required>
+        </div>
+
+        <div class="form-group" id="roomStayProofGroup">
+          <label class="form-label">Doctor Prescription / ACE Dispensary Slip (Mandatory if attendance is &lt; 75%)</label>
+          <input type="file" class="form-control" id="roomStayProofInput" accept="image/*" onchange="previewImage(event, 'roomStayProofPreview')">
+          <img id="roomStayProofPreview" style="display: none; width: 120px; height: 120px; border-radius: 8px; object-fit: cover; margin-top: 8px; border: 1px solid var(--border-glass);">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Remarks / Special Notes (Optional)</label>
+          <textarea class="form-control" id="roomStayDoctorNotes" rows="3" placeholder="Additional notes or remarks..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-warning" style="width: 100%; background: linear-gradient(135deg, #F59E0B, #D97706); color: #0F172A; font-weight: 800;">
+          🛏️ Submit Room Stay Pass
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- File Grievance Modal -->
+  <div class="modal-overlay" id="fileGrievanceModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">File Grievance / Ticket</h3>
+        <button class="btn-close-modal" onclick="closeFileGrievanceModal()">✕</button>
+      </div>
+      <form onsubmit="handleGrievanceSubmit(event)">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-control" id="grievanceCategory" required>
+              <option value="PLUMBING">🔧 Plumbing (Solve Photo Required)</option>
+              <option value="ELECTRICAL">⚡ Electrical (Solve Photo Required)</option>
+              <option value="MESS_FOOD">🍲 Mess Food (Solve Photo Required)</option>
+              <option value="CLEANLINESS_HYGIENE">🧹 Hygiene (Solve Photo Required)</option>
+              <option value="WIFI_INTERNET">📡 Wi-Fi & Internet</option>
+              <option value="DISCIPLINE_NOISE">🔇 Noise & Discipline</option>
+              <option value="OTHER">📝 Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Severity Level</label>
+            <select class="form-control" id="grievanceSeverity" required>
+              <option value="LOW">Low (Minor issue)</option>
+              <option value="MEDIUM" selected>Medium (Standard issue)</option>
+              <option value="HIGH">High (Urgent - Chief Warden Review)</option>
+              <option value="CRITICAL">Critical (Emergency - Chief Warden Review)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ticket Title</label>
+          <input type="text" class="form-control" id="grievanceTitle" placeholder="e.g. Water leak in Room 304 washroom" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" id="grievanceDesc" rows="3" placeholder="Explain the problem in detail..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Problem Photo Proof (Optional)</label>
+          <input type="file" class="form-control" id="grievancePhotoInput" accept="image/*" onchange="previewImage(event, 'problemPhotoPreview')">
+          <img id="problemPhotoPreview" style="display: none; width: 100px; height: 100px; border-radius: 8px; object-fit: cover; margin-top: 8px;">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Grievance Ticket</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Warden Solve Proof Photo Modal -->
+  <div class="modal-overlay" id="solveProofModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Resolve Ticket & Upload Solve Photo</h3>
+        <button class="btn-close-modal" onclick="closeSolveProofModal()">✕</button>
+      </div>
+      <form onsubmit="handleSolveTicketSubmit(event)">
+        <p style="font-size: 0.85rem; color: var(--amber-500); margin-bottom: 1rem;" id="solveProofNoticeText">
+          ⚠️ This physical category strictly requires uploading a Solve Proof Photo before closing.
+        </p>
+
+        <div class="form-group" id="solvePhotoGroup">
+          <label class="form-label">Upload Solve Proof Photo</label>
+          <input type="file" class="form-control" id="solvePhotoInput" accept="image/*" onchange="previewImage(event, 'solvePhotoPreview')">
+          <img id="solvePhotoPreview" style="display: none; width: 120px; height: 120px; border-radius: 8px; object-fit: cover; margin-top: 8px;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Resolution Notes</label>
+          <textarea class="form-control" id="solveNotes" rows="3" placeholder="Describe repair action taken..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success" style="width: 100%;">Complete & Mark Closed</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Student Modal (Warden Feature) -->
+  <div class="modal-overlay" id="registerStudentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Register New Hostel Student</h3>
+        <button class="btn-close-modal" onclick="closeRegisterStudentModal()">✕</button>
+      </div>
+      <form onsubmit="handleRegisterStudentSubmit(event)">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Student Full Name</label>
+            <input type="text" class="form-control" id="regStudentName" placeholder="e.g. Alex Rivers" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Roll Number</label>
+            <input type="text" class="form-control" id="regStudentRoll" placeholder="e.g. 2026-CSE-105" required>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Anna Univ Register Number</label>
+            <input type="text" class="form-control" id="regStudentRegNo" placeholder="e.g. 730323104105" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Academic Department</label>
+            <select class="form-control" id="regStudentDept" required>
+              <option value="Computer Science & Engineering" selected>Computer Science & Engineering (CSE)</option>
+              <option value="Electronics & Communication">Electronics & Communication (ECE)</option>
+              <option value="Mechanical Engineering">Mechanical Engineering (MECH)</option>
+              <option value="Civil Engineering">Civil Engineering (CIVIL)</option>
+              <option value="Information Technology">Information Technology (IT)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Academic Year & Class Section Fields Required by System -->
+        <div class="form-grid-2" style="background: rgba(99, 102, 241, 0.08); padding: 0.85rem; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2); margin-bottom: 1rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="color: #A5B4FC;">Academic Year</label>
+            <select class="form-control" id="regStudentYear" required>
+              <option value="I Year (1st Sem)">I Year (1st / 2nd Sem)</option>
+              <option value="II Year (3rd Sem)" selected>II Year (3rd / 4th Sem)</option>
+              <option value="III Year (5th Sem)">III Year (5th / 6th Sem)</option>
+              <option value="IV Year (7th Sem)">IV Year (7th / 8th Sem - Final Year)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" style="color: #A5B4FC;">Class Section (Assigned by HoD)</label>
+            <select class="form-control" id="regStudentSection" required>
+              <option value="Section A" selected>Section A (Tutor: Prof. M. Priya)</option>
+              <option value="Section B">Section B (Tutor: Prof. K. Ramesh)</option>
+              <option value="Section C">Section C (Tutor: Department Faculty)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Hostel Name & Block</label>
+            <select class="form-control" id="regStudentHostel" required>
+              <option value="Pennar Hostel (Block A)">Pennar Hostel (Block A)</option>
+              <option value="Pennar Hostel (Block B)" selected>Pennar Hostel (Block B)</option>
+              <option value="Bhavani Hostel (Block A)">Bhavani Hostel (Block A - Girls)</option>
+              <option value="Bhavani Hostel (Block C)">Bhavani Hostel (Block C - Girls)</option>
+              <option value="Cauvery Scholar Hostel">Cauvery Scholar Hostel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Room Number</label>
+            <input type="text" class="form-control" id="regStudentRoom" placeholder="Room 305" required>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Student Phone Number</label>
+            <input type="tel" class="form-control" id="regStudentPhone" placeholder="+91 9876543210" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Parent / Guardian Contact</label>
+            <input type="tel" class="form-control" id="regStudentParent" placeholder="+91 9876500000" required>
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Fixed Username</label>
+            <input type="text" class="form-control" id="regStudentUsername" placeholder="e.g. karthik_hostel" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Fixed Password</label>
+            <input type="password" class="form-control" id="regStudentPassword" placeholder="Set password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Student Account & Register</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reset Student Password Modal -->
+  <div class="modal-overlay" id="resetPasswordModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Reset Student Password</h3>
+        <button class="btn-close-modal" onclick="closeResetPasswordModal()">✕</button>
+      </div>
+      <form onsubmit="handleResetPasswordSubmit(event)">
+        <input type="hidden" id="resetStudentRoll">
+        <div class="form-group">
+          <label class="form-label">Student Name</label>
+          <input type="text" class="form-control" id="resetStudentName" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Fixed Password</label>
+          <input type="password" class="form-control" id="resetNewPassword" placeholder="Enter new password for student" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Reset Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Post Notice / Circular (HoD, Warden, Chief Warden) -->
+  <div class="modal-overlay" id="postNoticeModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">📢 Post Official Notice / Circular</h3>
+        <button class="btn-close-modal" onclick="closePostNoticeModal()">✕</button>
+      </div>
+      <form onsubmit="handlePostNoticeSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Notice Headline / Subject</label>
+          <input type="text" class="form-control" id="noticeTitleInput" placeholder="e.g. Model Practical Verification & Hostel Clearance" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Priority Level</label>
+            <select class="form-control" id="noticePriorityInput" required>
+              <option value="NORMAL">Normal Info</option>
+              <option value="HIGH" selected>High Priority</option>
+              <option value="URGENT">Urgent / Statutory</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Target Audience Scope</label>
+            <select class="form-control" id="noticeScopeSelect" required>
+              <option value="AUTO" selected>Auto-Scoped by Role</option>
+              <option value="DEPT">Department Students, Tutors & Wardens</option>
+              <option value="HOSTEL">Hostel Residents & Class Tutors</option>
+              <option value="CAMPUS">Entire Campus (All Roles)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Notice Content & Instructions</label>
+          <textarea class="form-control" id="noticeBodyInput" rows="4" placeholder="Type notice description, timings, requirements, and compliance guidelines..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">📢 Publish Official Notice</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Deputy Warden Count Card Item List Popup -->
+  <div class="modal-overlay" id="wardenCountModal">
+    <div class="modal-card" style="max-width: 900px; width: 95%; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="wardenCountModalTitle">📋 Pass Details List</h3>
+        <button class="btn-close-modal" onclick="closeWardenCountModal()">✕</button>
+      </div>
+      <div style="overflow-y: auto; flex: 1; padding: 0.5rem 0;" id="wardenCountModalBody">
+        <!-- Injected dynamically by openWardenCountModal() -->
+      </div>
+      <div style="border-top: 1px solid var(--border-glass); padding-top: 1rem; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.78rem; color: var(--text-muted);" id="wardenCountModalFooterCount">Showing active records</span>
+        <button class="btn btn-secondary" onclick="closeWardenCountModal()">Close Popup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Frontend Application Scripts -->
+  <script src="js/auth.js?v=2.8"></script>
+  <script src="js/storage.js?v=2.8"></script>
+  <script src="js/noticeboard.js?v=2.8"></script>
+  <script src="js/chat.js?v=2.8"></script>
+  <script src="js/student.js?v=2.8"></script>
+  <script src="js/warden.js?v=2.8"></script>
+  <script src="js/academic.js?v=2.8"></script>
+  <script src="js/security.js?v=2.8"></script>
+  <script src="js/admin.js?v=2.8"></script>
+  <script src="js/app.js?v=2.8"></script>
+</body>
+</html>
