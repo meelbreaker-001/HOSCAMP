@@ -320,12 +320,17 @@ function renderHodDashboard(area, user) {
 
     <!-- SECTION 2: CLASS TUTOR SECTION ALLOCATIONS (MANAGED BY HOD) -->
     <div class="dashboard-section" id="sectionHodTutors">
-      <div class="section-header">
-        <h3 class="section-title">📚 Department Class Tutor Section Allocations</h3>
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 class="section-title">📚 Department Class Tutor Section Allocations (HoD Authority)</h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Class Tutors organize separate sections. Each Tutor handles academic clearances and attendance uploads for hostel students in their assigned section across all 4 years.
+          </p>
+        </div>
+        <button class="btn btn-primary" style="padding: 0.45rem 0.9rem; font-size: 0.82rem;" onclick="openAddTutorModal()">
+          + Assign New Class Tutor
+        </button>
       </div>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-        Class Tutors organize separate sections. Each Tutor handles academic clearances and attendance uploads for hostel students in their assigned section across all 4 years.
-      </p>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
         ${tutors.map(t => `
@@ -334,6 +339,7 @@ function renderHodDashboard(area, user) {
               <div>
                 <b style="font-size: 1.1rem; color: var(--text-main);">${t.section}</b>
                 <div style="font-size: 0.85rem; color: #818CF8; margin-top: 0.2rem;">Class Tutor: <b>${t.tutorName}</b></div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">Login Username: <code>${t.tutorId || 'tutor'}</code></div>
               </div>
               <span class="status-pill approved">${students.filter(s => s.classSection === t.section).length} Hostellers</span>
             </div>
@@ -341,6 +347,10 @@ function renderHodDashboard(area, user) {
               • Jurisdiction: <b>${t.yearScope}</b><br>
               • Responsibility: <b>Uploads Academic Attendance & Issues Pass Clearances</b><br>
               • Authority: <b>Flexible first or second pass approval</b>
+            </div>
+            <div style="margin-top: 0.75rem; border-top: 1px solid var(--border-glass); padding-top: 0.6rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+              <button class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="openEditTutorModal('${t.tutorId}')">✏️ Edit</button>
+              <button class="btn btn-danger" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="deleteTutorAllocation('${t.tutorId}')">🗑️ Remove</button>
             </div>
           </div>
         `).join('')}
@@ -859,6 +869,111 @@ function saveTutorAttendanceRoster(rollNumber, studentName) {
         `This verified attendance will now reflect everywhere across the entire hostel portal.`);
 }
 
+// ==========================================================================
+// HoD Class Tutor Management Handlers
+// ==========================================================================
+function openAddTutorModal() {
+  const modal = document.getElementById('manageTutorModal');
+  if (!modal) return;
+  document.getElementById('manageTutorModalTitle').innerText = '📚 Assign Class Tutor (HoD Authority)';
+  document.getElementById('tutorEditId').value = '';
+  document.getElementById('tutorSectionInput').value = '';
+  document.getElementById('tutorNameInput').value = '';
+  document.getElementById('tutorUsernameInput').value = '';
+  document.getElementById('tutorPasswordInput').value = 'pass123';
+  document.getElementById('tutorScopeInput').value = 'Years 1, 2, 3, 4 (Section Hostellers)';
+  modal.classList.add('active');
+}
+
+function openEditTutorModal(tutorId) {
+  const modal = document.getElementById('manageTutorModal');
+  if (!modal) return;
+  const tutors = window.tutorSectionAllocations || [];
+  const t = tutors.find(item => item.tutorId === tutorId);
+  if (!t) return;
+  document.getElementById('manageTutorModalTitle').innerText = '✏️ Edit Class Tutor Allocation';
+  document.getElementById('tutorEditId').value = t.tutorId;
+  document.getElementById('tutorSectionInput').value = t.section || '';
+  document.getElementById('tutorNameInput').value = t.tutorName || '';
+  document.getElementById('tutorUsernameInput').value = t.tutorId || '';
+  document.getElementById('tutorPasswordInput').value = 'pass123';
+  document.getElementById('tutorScopeInput').value = t.yearScope || 'Years 1, 2, 3, 4';
+  modal.classList.add('active');
+}
+
+function closeTutorModal() {
+  const modal = document.getElementById('manageTutorModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function handleSaveTutorSubmit(e) {
+  e.preventDefault();
+  const editId = document.getElementById('tutorEditId').value;
+  const section = document.getElementById('tutorSectionInput').value.trim();
+  const name = document.getElementById('tutorNameInput').value.trim();
+  const username = document.getElementById('tutorUsernameInput').value.trim();
+  const password = document.getElementById('tutorPasswordInput').value.trim();
+  const scope = document.getElementById('tutorScopeInput').value.trim();
+
+  if (!section || !name || !username) {
+    alert('Please fill out all required fields.');
+    return;
+  }
+
+  if (!window.tutorSectionAllocations) window.tutorSectionAllocations = [];
+  if (!window.SYSTEM_ACCOUNTS) window.SYSTEM_ACCOUNTS = {};
+
+  if (editId) {
+    const idx = window.tutorSectionAllocations.findIndex(item => item.tutorId === editId);
+    if (idx !== -1) {
+      window.tutorSectionAllocations[idx].section = section;
+      window.tutorSectionAllocations[idx].tutorName = name;
+      window.tutorSectionAllocations[idx].yearScope = scope;
+    }
+  } else {
+    const existing = window.tutorSectionAllocations.find(item => item.tutorId === username);
+    if (existing) {
+      alert(`⚠️ A tutor with username "${username}" already exists!`);
+      return;
+    }
+    window.tutorSectionAllocations.push({
+      tutorId: username,
+      tutorName: name,
+      department: 'Computer Science & Engineering',
+      section: section,
+      yearScope: scope,
+      studentsCount: 0
+    });
+  }
+
+  window.SYSTEM_ACCOUNTS[username] = {
+    id: Date.now(),
+    username: username,
+    password: password,
+    fullName: `${name} (Class Tutor)`,
+    role: 'TUTOR',
+    department: 'Computer Science & Engineering',
+    classSection: section
+  };
+
+  if (window.saveAppState) window.saveAppState();
+  closeTutorModal();
+  renderAcademicDashboard();
+  alert(`✅ CLASS TUTOR ALLOCATION SAVED!\n\nTutor: ${name}\nSection: ${section}\nUsername: ${username}\nCredentials registered for instant login.`);
+}
+
+function deleteTutorAllocation(tutorId) {
+  if (!confirm(`⚠️ Are you sure you want to remove Class Tutor allocation "${tutorId}"?\n\nThis will unassign the tutor from their section.`)) {
+    return;
+  }
+  if (!window.tutorSectionAllocations) window.tutorSectionAllocations = [];
+  window.tutorSectionAllocations = window.tutorSectionAllocations.filter(t => t.tutorId !== tutorId);
+  
+  if (window.saveAppState) window.saveAppState();
+  renderAcademicDashboard();
+  alert(`🗑️ CLASS TUTOR ALLOCATION REMOVED!\n\nTutor ${tutorId} has been successfully unassigned.`);
+}
+
 // Window bindings
 window.renderAcademicDashboard = renderAcademicDashboard;
 window.approveAcademicPass = approveAcademicPass;
@@ -866,5 +981,10 @@ window.rejectAcademicPass = rejectAcademicPass;
 window.setHodYearFilter = setHodYearFilter;
 window.handleHodSearch = handleHodSearch;
 window.saveTutorAttendanceRoster = saveTutorAttendanceRoster;
+window.openAddTutorModal = openAddTutorModal;
+window.openEditTutorModal = openEditTutorModal;
+window.closeTutorModal = closeTutorModal;
+window.handleSaveTutorSubmit = handleSaveTutorSubmit;
+window.deleteTutorAllocation = deleteTutorAllocation;
 window.sampleAcademicVerifications = sampleAcademicVerifications;
 window.sampleOverdueAcademicQueue = sampleOverdueAcademicQueue;

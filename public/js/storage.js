@@ -24,7 +24,9 @@ function saveAppState() {
       outInPasses: window.sampleOutInPasses || [],
       roomStayPasses: window.sampleRoomStayPasses || [],
       studentGrievances: window.sampleStudentGrievances || [],
-      systemNotices: window.sampleSystemNotices || []
+      systemNotices: window.sampleSystemNotices || [],
+      tutorAllocations: window.tutorSectionAllocations || [],
+      wardenAllocations: window.deputyWardenAllocations || []
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
@@ -49,6 +51,12 @@ function loadAppState() {
     }
     if (saved.systemAccounts && Object.keys(saved.systemAccounts).length > 0) {
       window.SYSTEM_ACCOUNTS = Object.assign(window.SYSTEM_ACCOUNTS || {}, saved.systemAccounts);
+    }
+    if (saved.tutorAllocations && saved.tutorAllocations.length > 0) {
+      window.tutorSectionAllocations = saved.tutorAllocations;
+    }
+    if (saved.wardenAllocations && saved.wardenAllocations.length > 0) {
+      window.deputyWardenAllocations = saved.wardenAllocations;
     }
     if (saved.wardenPendingPasses) {
       window.sampleWardenPendingPasses = saved.wardenPendingPasses;

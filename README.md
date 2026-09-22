@@ -23,10 +23,14 @@
 * **Propagated Everywhere**: Displayed transparently across HoD clearance directories, Warden pass queues, and Student dashboards as: `XX% (Uploaded by Class Tutor)`.
 * **75% Statutory Rule**: Enforces the Anna University / ACE mandatory 75% attendance rule; exceptions are strictly reserved for certified medical/sickness grounds.
 
-### 3. 🎓 HoD 4-Year Hostel Clearance Directory
+### 3. 🎓 HoD 4-Year Hostel Directory & Class Tutor Allocations
 * **Strictly Hostel Students Only**: Filters out day scholars and displays residential students across all 4 academic years (**I Year, II Year, III Year, IV Year**).
 * **Fast Year Tabs**: Interactive 1-click filtering (`All 4 Years`, `1st Year`, `2nd Year`, `3rd Year`, `4th Year`) plus real-time search by Roll Number, Anna Univ Register Number, or Student Name.
-* **Tutor Allocations Hub**: Displays and organizes faculty assignments by class sections (e.g. *Section A*, *Section B*).
+* **Active Tutor Allocations Management (HoD Authority)**:
+  * HoD can assign new Class Tutors to specific sections (e.g. *Section A*, *Section B*, *Section C*).
+  * Edit and reassign jurisdiction and scopes.
+  * Remove/unassign tutors.
+  * Newly created tutors are instantly registered with credentials in `SYSTEM_ACCOUNTS` and can log in immediately.
 
 ### 4. 🛡️ Deputy Warden Operations & Student Onboarding
 * **Student Registration Form**: Registers hostel residents with full institutional data binding:
@@ -46,13 +50,19 @@
   * **Hostel Bulletins**: Route to hostel residents, tutors, and the Chief Warden.
   * **Campus-Wide Alerts**: Published by the Chief Warden/Principal, reaching all campus roles.
 
-### 7. 👑 Supreme Administration (Chief Warden & Principal)
+### 7. 👑 Supreme Administration & Chief Warden Governance
 * **Campus-Wide Jurisdiction**: Central authority over all campus hostels (Pennar, Bhavani, Cauvery).
+* **Deputy Warden Appointments & Administration (Chief Warden Authority)**:
+  * Appoint new Deputy Wardens with designated hostel blocks (Pennar, Bhavani, Cauvery).
+  * Edit and reassign hostel block jurisdictions and official contact phones.
+  * Relieve wardens from active service.
+  * Create official accounts (HoD, Deputy Warden, Master Security) with instant password and credential activation.
 * **30-Day Warden Audit Trail**: Detailed chronological ledger of every operational action taken by wardens.
 * **CSV Export Engine**: 1-click download of the complete audit log for statutory governance.
 
 ### 8. 💾 Persistent Data Engine (Zero Data Loss)
-* Automatically caches all registered students, updated attendance percentages, approved passes, notices, and tickets into browser `localStorage`.
+* Automatically caches all registered students, updated attendance percentages, approved passes, notices, tutor allocations, deputy warden appointments, and tickets into browser `localStorage`.
+* Prevents data loss on browser refresh during live presentations.
 * Prevents data loss on browser refresh during live presentations.
 
 ---

@@ -136,6 +136,44 @@ function renderAdminDashboard() {
       </div>
     </div>
 
+    <!-- SECTION 1B: DEPUTY WARDEN APPOINTMENTS & ALLOCATIONS -->
+    <div class="dashboard-section" id="sectionAdminWardens">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 class="section-title">🛡️ Deputy Warden Allocations & Administration (Chief Warden Authority)</h3>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+            The Chief Warden appoints, reassigns, and oversees Deputy Wardens across each residential hostel block.
+          </p>
+        </div>
+        <button class="btn btn-primary" style="padding: 0.45rem 0.9rem; font-size: 0.82rem;" onclick="openAddWardenModal()">
+          + Appoint Deputy Warden
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+        ${(window.deputyWardenAllocations || []).map(w => `
+          <div class="stat-card" style="display: block; border-color: rgba(16, 185, 129, 0.35);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <b style="font-size: 1.1rem; color: var(--text-main);">${w.wardenName}</b>
+                <div style="font-size: 0.85rem; color: #34D399; margin-top: 0.2rem;">${w.hostelName} • <b>${w.hostelBlock}</b></div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">Login: <code>${w.wardenId}</code> | Tel: <b>${w.phone || '-'}</b></div>
+              </div>
+              <span class="status-pill approved">${w.residentsCount || 'Active'} Residents</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; margin-top: 0.75rem; border-top: 1px solid var(--border-glass); padding-top: 0.5rem;">
+              • Authority: <b>First/Second Pass Clearance & Night Curfew Enforcement</b><br>
+              • Disciplinary Log: <b>30-Day Gate Security Incident Review Active</b>
+            </div>
+            <div style="margin-top: 0.75rem; border-top: 1px solid var(--border-glass); padding-top: 0.6rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+              <button class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="openEditWardenModal('${w.wardenId}')">✏️ Edit / Reassign</button>
+              <button class="btn btn-danger" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="deleteDeputyWardenAllocation('${w.wardenId}')">🗑️ Relieve</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
     <!-- SECTION 2: DEPUTY WARDEN AUDIT TRAIL & CSV EXTRACTION -->
     <div class="dashboard-section" id="sectionAdminAudit">
       <div class="section-header">
@@ -313,12 +351,164 @@ function handleOfficialRoleChange(role) {
 function handleCreateOfficialSubmit(e) {
   e.preventDefault();
   const role = document.getElementById('officialRole').value;
-  const name = document.getElementById('officialName').value;
-  const username = document.getElementById('officialUsername').value;
-  const pass = document.getElementById('officialPassword').value;
+  const name = document.getElementById('officialName').value.trim();
+  const username = document.getElementById('officialUsername').value.trim();
+  const pass = document.getElementById('officialPassword').value.trim();
 
+  if (!name || !username || !pass) {
+    alert('Please fill out all required fields.');
+    return;
+  }
+
+  if (!window.SYSTEM_ACCOUNTS) window.SYSTEM_ACCOUNTS = {};
+
+  const newAccount = {
+    id: Date.now(),
+    username: username,
+    password: pass,
+    fullName: name,
+    role: role
+  };
+
+  if (role === 'WARDEN') {
+    const hostel = document.getElementById('officialHostelName').value;
+    const block = document.getElementById('officialHostelBlock').value || 'Block B';
+    newAccount.hostelName = hostel;
+    newAccount.hostelBlock = block;
+    newAccount.assignedHostel = hostel;
+
+    if (!window.deputyWardenAllocations) window.deputyWardenAllocations = [];
+    window.deputyWardenAllocations.push({
+      wardenId: username,
+      wardenName: name,
+      hostelName: hostel,
+      hostelBlock: block,
+      phone: '+91 94421 88200',
+      residentsCount: 150
+    });
+  } else if (role === 'HOD') {
+    newAccount.department = 'Computer Science & Engineering';
+  } else if (role === 'SECURITY') {
+    newAccount.checkpoint = 'Main Gate Checkpoint';
+  }
+
+  window.SYSTEM_ACCOUNTS[username] = newAccount;
+
+  if (window.saveAppState) window.saveAppState();
   toggleCreateOfficialForm();
-  alert(`✅ OFFICIAL ACCOUNT CREATED!\n\nRole: ${role}\nName: ${name}\nUsername: ${username}\nCredentials saved to system database.`);
+  renderAdminDashboard();
+  alert(`✅ OFFICIAL ACCOUNT REGISTERED!\n\nRole: ${role}\nName: ${name}\nUsername: ${username}\nCredentials saved to system database and ready for instant login.`);
+}
+
+// ==========================================================================
+// Chief Warden Deputy Warden Management Handlers
+// ==========================================================================
+function openAddWardenModal() {
+  const modal = document.getElementById('manageWardenModal');
+  if (!modal) return;
+  document.getElementById('manageWardenModalTitle').innerText = '🛡️ Appoint Deputy Warden (Chief Warden Authority)';
+  document.getElementById('wardenEditId').value = '';
+  document.getElementById('wardenHostelInput').value = 'Pennar Hostel (Boys)';
+  document.getElementById('wardenBlockInput').value = '';
+  document.getElementById('wardenNameInput').value = '';
+  document.getElementById('wardenPhoneInput').value = '+91 ';
+  document.getElementById('wardenUsernameInput').value = '';
+  document.getElementById('wardenPasswordInput').value = 'pass123';
+  modal.classList.add('active');
+}
+
+function openEditWardenModal(wardenId) {
+  const modal = document.getElementById('manageWardenModal');
+  if (!modal) return;
+  const wardens = window.deputyWardenAllocations || [];
+  const w = wardens.find(item => item.wardenId === wardenId);
+  if (!w) return;
+  document.getElementById('manageWardenModalTitle').innerText = '✏️ Edit / Reassign Deputy Warden';
+  document.getElementById('wardenEditId').value = w.wardenId;
+  document.getElementById('wardenHostelInput').value = w.hostelName || 'Pennar Hostel (Boys)';
+  document.getElementById('wardenBlockInput').value = w.hostelBlock || '';
+  document.getElementById('wardenNameInput').value = w.wardenName || '';
+  document.getElementById('wardenPhoneInput').value = w.phone || '';
+  document.getElementById('wardenUsernameInput').value = w.wardenId || '';
+  document.getElementById('wardenPasswordInput').value = 'pass123';
+  modal.classList.add('active');
+}
+
+function closeWardenModal() {
+  const modal = document.getElementById('manageWardenModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function handleSaveDeputyWardenSubmit(e) {
+  e.preventDefault();
+  const editId = document.getElementById('wardenEditId').value;
+  const hostel = document.getElementById('wardenHostelInput').value;
+  const block = document.getElementById('wardenBlockInput').value.trim();
+  const name = document.getElementById('wardenNameInput').value.trim();
+  const phone = document.getElementById('wardenPhoneInput').value.trim();
+  const username = document.getElementById('wardenUsernameInput').value.trim();
+  const password = document.getElementById('wardenPasswordInput').value.trim();
+
+  if (!hostel || !block || !name || !username) {
+    alert('Please fill out all required fields.');
+    return;
+  }
+
+  if (!window.deputyWardenAllocations) window.deputyWardenAllocations = [];
+  if (!window.SYSTEM_ACCOUNTS) window.SYSTEM_ACCOUNTS = {};
+
+  if (editId) {
+    const idx = window.deputyWardenAllocations.findIndex(item => item.wardenId === editId);
+    if (idx !== -1) {
+      window.deputyWardenAllocations[idx].hostelName = hostel;
+      window.deputyWardenAllocations[idx].hostelBlock = block;
+      window.deputyWardenAllocations[idx].wardenName = name;
+      window.deputyWardenAllocations[idx].phone = phone;
+    }
+  } else {
+    const existing = window.deputyWardenAllocations.find(item => item.wardenId === username);
+    if (existing) {
+      alert(`⚠️ A warden with username "${username}" already exists!`);
+      return;
+    }
+    window.deputyWardenAllocations.push({
+      wardenId: username,
+      wardenName: name,
+      hostelName: hostel,
+      hostelBlock: block,
+      phone: phone,
+      residentsCount: 150
+    });
+  }
+
+  // Register in SYSTEM_ACCOUNTS
+  window.SYSTEM_ACCOUNTS[username] = {
+    id: Date.now(),
+    username: username,
+    password: password,
+    fullName: `${name} (Deputy Warden)`,
+    role: 'WARDEN',
+    hostelName: hostel,
+    hostelBlock: block,
+    assignedHostel: hostel
+  };
+
+  if (window.saveAppState) window.saveAppState();
+  closeWardenModal();
+  renderAdminDashboard();
+  alert(`✅ DEPUTY WARDEN APPOINTMENT SAVED!\n\nWarden: ${name}\nJurisdiction: ${hostel} (${block})\nUsername: ${username}\nCredentials saved and ready for instant login.`);
+}
+
+function deleteDeputyWardenAllocation(wardenId) {
+  if (!confirm(`⚠️ Are you sure you want to relieve Deputy Warden "${wardenId}"?\n\nThis will remove their active jurisdiction allocation.`)) {
+    return;
+  }
+  if (!window.deputyWardenAllocations) window.deputyWardenAllocations = [];
+  window.deputyWardenAllocations = window.deputyWardenAllocations.filter(w => w.wardenId !== wardenId);
+
+  if (window.saveAppState) window.saveAppState();
+  renderAdminDashboard();
+  alert(`🗑️ DEPUTY WARDEN RELIEVED!\n\nWarden ${wardenId} has been successfully relieved of duty.`);
 }
 
 function adminSignOffComplaint(ticketId) {
@@ -332,4 +522,9 @@ window.extractAuditLogCSV = extractAuditLogCSV;
 window.toggleCreateOfficialForm = toggleCreateOfficialForm;
 window.handleOfficialRoleChange = handleOfficialRoleChange;
 window.handleCreateOfficialSubmit = handleCreateOfficialSubmit;
+window.openAddWardenModal = openAddWardenModal;
+window.openEditWardenModal = openEditWardenModal;
+window.closeWardenModal = closeWardenModal;
+window.handleSaveDeputyWardenSubmit = handleSaveDeputyWardenSubmit;
+window.deleteDeputyWardenAllocation = deleteDeputyWardenAllocation;
 window.adminSignOffComplaint = adminSignOffComplaint;

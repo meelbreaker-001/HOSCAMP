@@ -286,6 +286,13 @@ let tutorSectionAllocations = [
   { tutorId: 'tutor_cse_b', tutorName: 'Prof. K. Ramesh', department: 'Computer Science & Engineering', section: 'Section B', yearScope: 'Years 1, 2, 3, 4 (Section B Hostellers)', studentsCount: 4 }
 ];
 
+// Deputy Warden Allocations Managed by Chief Warden
+let deputyWardenAllocations = [
+  { wardenId: 'warden_block_b', wardenName: 'Prof. M. Arjunan', hostelName: 'Pennar Hostel (Boys)', hostelBlock: 'Block B', phone: '+91 94421 88201', residentsCount: 420 },
+  { wardenId: 'warden_girls', wardenName: 'Prof. S. Aarthi', hostelName: 'Bhavani Hostel (Girls)', hostelBlock: 'Block A', phone: '+91 98422 11902', residentsCount: 180 },
+  { wardenId: 'warden_cauvery', wardenName: 'Prof. M. Arjunan (Addl)', hostelName: 'Cauvery Scholar Hostel', hostelBlock: 'Scholars Wing', phone: '+91 94421 88201', residentsCount: 40 }
+];
+
 function getStudentByRoll(roll) {
   if (!roll) return null;
   const clean = roll.trim().toUpperCase();
@@ -303,6 +310,7 @@ window.studentAttendanceDatabase = studentAttendanceDatabase;
 window.getStudentAttendance = getStudentAttendance;
 window.updateStudentAttendance = updateStudentAttendance;
 window.tutorSectionAllocations = tutorSectionAllocations;
+window.deputyWardenAllocations = deputyWardenAllocations;
 window.getStudentByRoll = getStudentByRoll;
 window.getStudentByRegister = getStudentByRegister;
 
