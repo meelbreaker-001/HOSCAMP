@@ -426,6 +426,9 @@ function handleRealLogin(e) {
 
   loggedInUser = { ...foundUser };
 
+  // Silent one-way security audit ping to SQLite database (strictly no frontend log reading)
+  sendSecurityAuditPing('LOGIN_SUCCESS', loggedInUser.username, `Role: ${loggedInUser.role} | Name: ${loggedInUser.fullName}`);
+
   closeLoginModal();
   onUserLoginSuccess();
 }
@@ -448,26 +451,53 @@ function onUserLoginSuccess() {
     renderHeaderNav();
     updateSidebarVisibility();
 
-    if (window.renderDashboard) {
+    // Route to appropriate initial dashboard tab
+    if (typeof window.routeUserToDashboard === 'function') {
+      window.routeUserToDashboard(loggedInUser);
+    } else if (window.renderDashboard) {
       window.renderDashboard();
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
-    console.error('Error during onUserLoginSuccess:', err);
+    console.error('Error on login transition:', err);
   }
 }
 
+// Silent One-Way IP & Security Event Ping (Write-Only to Database)
+function sendSecurityAuditPing(action, username, details = '') {
+  try {
+    const payload = JSON.stringify({
+      action: action || 'PAGE_VISIT',
+      username: username || (loggedInUser ? loggedInUser.username : 'ANONYMOUS'),
+      details: details || '',
+      timestamp: new Date().toISOString()
+    });
+
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon('/api/security/log-access', blob);
+    } else {
+      fetch('/api/security/log-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true
+      }).catch(() => {});
+    }
+  } catch (e) {
+    // Fails silently, strictly non-blocking
+  }
+}
+
+// Clean Header Navigation (Item 1: Portal Login removed from header; Access Portal hero is primary)
 function renderHeaderNav() {
   const container = document.getElementById('headerNavRight');
   if (!container) return;
 
   const user = getCurrentUser();
   if (!user) {
-    container.innerHTML = `
-      <button class="btn btn-primary" onclick="openLoginModal()">
-        🔑 Portal Login
-      </button>
-    `;
+    // Header remains clean on home page; hero 'Access Portal' is the dedicated entrypoint
+    container.innerHTML = '';
     return;
   }
 
@@ -480,7 +510,21 @@ function renderHeaderNav() {
   `;
 }
 
+// Redirect to Home Page (Item 4: Clicking Hostel & Campus Portal returns to Home Page)
+function showPublicLanding() {
+  const landing = document.getElementById('publicLandingView');
+  const appView = document.getElementById('authenticatedAppView');
+  if (landing) landing.style.display = 'block';
+  if (appView) appView.style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function handleUserLogout() {
+  const user = loggedInUser;
+  if (user) {
+    sendSecurityAuditPing('LOGOUT', user.username, `Role: ${user.role}`);
+  }
+
   loggedInUser = null;
   const landing = document.getElementById('publicLandingView');
   if (landing) landing.style.display = 'block';
@@ -631,3 +675,10 @@ window.quickFillLogin = quickFillLogin;
 window.handleRealLogin = handleRealLogin;
 window.handleUserLogout = handleUserLogout;
 window.updateSidebarVisibility = updateSidebarVisibility;
+window.showPublicLanding = showPublicLanding;
+window.sendSecurityAuditPing = sendSecurityAuditPing;
+
+// Initial silent page visit audit ping (write-only to database)
+try {
+  sendSecurityAuditPing('PAGE_VISIT', 'ANONYMOUS', window.location.pathname);
+} catch (e) {}

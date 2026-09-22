@@ -87,19 +87,24 @@ You can use the quick-fill chips on the login modal or enter the credentials bel
 
 ## 🚀 How to Run Locally
 
-### Option 1: Python (Built-in Web Server)
+### Option 1: Python Server with SQLite Security Audit Logging (Recommended)
 ```bash
-# From project root directory
-python -m http.server 3000 --directory public
+# Run server with automatic SQLite IP and security event capture:
+python server.py
 ```
-Then open your browser at **`http://localhost:3000`**.
+Open your browser at **`http://localhost:3000`**.
+
+To securely inspect the database access and IP logs from your terminal (never exposed to browser):
+```bash
+python server.py --view-logs
+```
 
 ### Option 2: Node.js / Express
 ```bash
 npm install
 npm start
 ```
-Then open your browser at **`http://localhost:3000`**.
+Open your browser at **`http://localhost:3000`**.
 
 ---
 

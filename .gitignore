@@ -3,3 +3,6 @@ node_modules/
 Thumbs.db
 *.log
 .env
+database/*.db
+database/*.jsonl
+database/*.sqlite

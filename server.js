@@ -35,6 +35,37 @@ app.get('/api/roles', (req, res) => {
   });
 });
 
+// Secure One-Way IP & Event Ingestion (Strictly NO Read Endpoint to Browser)
+const fs = require('fs');
+const DB_DIR = path.join(__dirname, 'database');
+const LOG_FILE = path.join(DB_DIR, 'security_access_ledger.jsonl');
+
+app.post('/api/security/log-access', (req, res) => {
+  const clientIP = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
+  const { action, username, details } = req.body || {};
+  const userAgent = req.headers['user-agent'] || 'Unknown';
+
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    client_ip: clientIP,
+    action: action || 'PAGE_VISIT',
+    username: username || 'ANONYMOUS',
+    route: req.url,
+    user_agent: userAgent,
+    details: details || ''
+  };
+
+  try {
+    if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+    fs.appendFileSync(LOG_FILE, JSON.stringify(logEntry) + '\n', 'utf8');
+  } catch (err) {
+    console.error('[SECURITY LOG ERROR]', err);
+  }
+
+  // Return 204 No Content (No log data ever exposed back to client)
+  res.status(204).end();
+});
+
 // Fallback route to serve single page app
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
