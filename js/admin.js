@@ -395,6 +395,8 @@ function handleCreateOfficialSubmit(e) {
   window.SYSTEM_ACCOUNTS[username] = newAccount;
 
   if (window.saveAppState) window.saveAppState();
+  if (typeof window.syncProfileToCloud === 'function') window.syncProfileToCloud(newAccount);
+
   toggleCreateOfficialForm();
   renderAdminDashboard();
   alert(`✅ OFFICIAL ACCOUNT REGISTERED!\n\nRole: ${role}\nName: ${name}\nUsername: ${username}\nCredentials saved to system database and ready for instant login.`);
@@ -482,7 +484,7 @@ function handleSaveDeputyWardenSubmit(e) {
   }
 
   // Register in SYSTEM_ACCOUNTS
-  window.SYSTEM_ACCOUNTS[username] = {
+  const wardenAccount = {
     id: Date.now(),
     username: username,
     password: password,
@@ -492,8 +494,11 @@ function handleSaveDeputyWardenSubmit(e) {
     hostelBlock: block,
     assignedHostel: hostel
   };
+  window.SYSTEM_ACCOUNTS[username] = wardenAccount;
 
   if (window.saveAppState) window.saveAppState();
+  if (typeof window.syncProfileToCloud === 'function') window.syncProfileToCloud(wardenAccount);
+
   closeWardenModal();
   renderAdminDashboard();
   alert(`✅ DEPUTY WARDEN APPOINTMENT SAVED!\n\nWarden: ${name}\nJurisdiction: ${hostel} (${block})\nUsername: ${username}\nCredentials saved and ready for instant login.`);
@@ -507,6 +512,8 @@ function deleteDeputyWardenAllocation(wardenId) {
   window.deputyWardenAllocations = window.deputyWardenAllocations.filter(w => w.wardenId !== wardenId);
 
   if (window.saveAppState) window.saveAppState();
+  if (typeof window.deleteProfileFromCloud === 'function') window.deleteProfileFromCloud(wardenId);
+
   renderAdminDashboard();
   alert(`🗑️ DEPUTY WARDEN RELIEVED!\n\nWarden ${wardenId} has been successfully relieved of duty.`);
 }

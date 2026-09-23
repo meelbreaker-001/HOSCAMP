@@ -258,6 +258,62 @@ async function logSecurityEventToCloud(action, username, details) {
   }
 }
 
+// -----------------------------------------------------------------------------
+// Cloud Official Profile Sync
+// -----------------------------------------------------------------------------
+async function syncProfileToCloud(profileObj) {
+  const sb = getSupabase();
+  if (!sb || !profileObj) return;
+
+  try {
+    const { error } = await sb
+      .from('profiles')
+      .upsert({
+        roll_number: profileObj.username || profileObj.rollNumber,
+        register_number: profileObj.registerNumber || null,
+        full_name: profileObj.fullName || 'Official',
+        role: profileObj.role || 'WARDEN',
+        department: profileObj.department || null,
+        dept_code: profileObj.deptCode || null,
+        year_number: profileObj.yearNumber || null,
+        class_section: profileObj.classSection || null,
+        hostel_name: profileObj.hostelName || null,
+        hostel_block: profileObj.hostelBlock || null,
+        room_number: profileObj.roomNumber || null,
+        phone: profileObj.phone || null,
+        password: profileObj.password || 'pass123'
+      }, { onConflict: 'roll_number' });
+
+    if (error) {
+      console.warn('Supabase profile sync error:', error.message);
+    } else {
+      console.log('✅ Official profile saved to Supabase Cloud:', profileObj.username || profileObj.rollNumber);
+    }
+  } catch (err) {
+    console.warn('Supabase profile sync error:', err);
+  }
+}
+
+async function deleteProfileFromCloud(rollOrUsername) {
+  const sb = getSupabase();
+  if (!sb || !rollOrUsername) return;
+
+  try {
+    const { error } = await sb
+      .from('profiles')
+      .delete()
+      .eq('roll_number', rollOrUsername);
+
+    if (error) {
+      console.warn('Supabase profile delete error:', error.message);
+    } else {
+      console.log('🗑️ Official profile removed from Supabase Cloud:', rollOrUsername);
+    }
+  } catch (err) {
+    console.warn('Supabase profile delete error:', err);
+  }
+}
+
 // Auto-initialize when script loads
 document.addEventListener('DOMContentLoaded', () => {
   initSupabase();
@@ -271,3 +327,5 @@ window.syncPassToCloud = syncPassToCloud;
 window.syncGrievanceToCloud = syncGrievanceToCloud;
 window.logSecurityEventToCloud = logSecurityEventToCloud;
 window.syncCloudDataOnLoad = syncCloudDataOnLoad;
+window.syncProfileToCloud = syncProfileToCloud;
+window.deleteProfileFromCloud = deleteProfileFromCloud;
