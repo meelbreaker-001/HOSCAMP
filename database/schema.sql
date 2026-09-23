@@ -1,10 +1,14 @@
 -- ==========================================================================
 -- HostelConnect - Supabase PostgreSQL Cloud Database Schema
 -- Adhiyamaan College of Engineering (ACE), Hosur
--- Copy and paste this script directly into Supabase SQL Editor -> Run!
+--
+-- ARCHITECTURE: Pure Supreme Hierarchy
+-- Only the Supreme Administration (Principal & Chief Warden) is seeded here.
+-- All other roles (HoDs, Class Tutors, Deputy Wardens, Gate Security, and Students)
+-- are created and assigned from the portal by the Principal / Chief Warden.
 -- ==========================================================================
 
--- 1. Profiles Table (Students, Tutors, Wardens, HoD, Security, Chief Warden, Principal)
+-- 1. Profiles Table (Master System Registry)
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   roll_number TEXT UNIQUE NOT NULL,
@@ -43,7 +47,7 @@ CREATE TABLE IF NOT EXISTS passes (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Academic Attendance Ledger (Uploaded by Class Tutors across 4 Years)
+-- 3. Academic Attendance Ledger (Managed by Class Tutors)
 CREATE TABLE IF NOT EXISTS attendance (
   roll_number TEXT PRIMARY KEY,
   student_name TEXT NOT NULL,
@@ -70,7 +74,7 @@ CREATE TABLE IF NOT EXISTS grievances (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Private Security & IP Access Ledger
+-- 5. Gate & Security Access Audit Ledger
 CREATE TABLE IF NOT EXISTS security_access_logs (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   client_ip TEXT NOT NULL DEFAULT 'CLIENT_BROWSER',
@@ -81,39 +85,39 @@ CREATE TABLE IF NOT EXISTS security_access_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Row Level Security (RLS) Configuration - Permissive for Campus Web Access
+-- Row Level Security (RLS) - Permissive for Web Client Access (No DROP statements)
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE passes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attendance ENABLE ROW LEVEL SECURITY;
 ALTER TABLE grievances ENABLE ROW LEVEL SECURITY;
 ALTER TABLE security_access_logs ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Allow All Profiles" ON profiles;
-CREATE POLICY "Allow All Profiles" ON profiles FOR ALL USING (true) WITH CHECK (true);
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'profiles' AND policyname = 'Allow All Profiles') THEN
+    CREATE POLICY "Allow All Profiles" ON profiles FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'passes' AND policyname = 'Allow All Passes') THEN
+    CREATE POLICY "Allow All Passes" ON passes FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'attendance' AND policyname = 'Allow All Attendance') THEN
+    CREATE POLICY "Allow All Attendance" ON attendance FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'grievances' AND policyname = 'Allow All Grievances') THEN
+    CREATE POLICY "Allow All Grievances" ON grievances FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'security_access_logs' AND policyname = 'Allow All Security Logs') THEN
+    CREATE POLICY "Allow All Security Logs" ON security_access_logs FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
 
-DROP POLICY IF EXISTS "Allow All Passes" ON passes;
-CREATE POLICY "Allow All Passes" ON passes FOR ALL USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow All Attendance" ON attendance;
-CREATE POLICY "Allow All Attendance" ON attendance FOR ALL USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow All Grievances" ON grievances;
-CREATE POLICY "Allow All Grievances" ON grievances FOR ALL USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow All Security Logs" ON security_access_logs;
-CREATE POLICY "Allow All Security Logs" ON security_access_logs FOR ALL USING (true) WITH CHECK (true);
-
--- Institutional Seed Accounts (Official Adhiyamaan College of Engineering)
-INSERT INTO profiles (roll_number, register_number, full_name, role, department, year_number, class_section, hostel_name, hostel_block, room_number, phone, password)
+-- ==========================================================================
+-- Supreme Administration Accounts ONLY (Chief Warden & Principal)
+-- You can change the usernames & passwords below to whatever you prefer!
+-- ==========================================================================
+INSERT INTO profiles (roll_number, full_name, role, password)
 VALUES 
-  ('2026-CSE-104', '730323104104', 'Alex Rivers', 'STUDENT', 'Computer Science & Engineering', 2, 'Section A', 'Pennar Hostel (Boys)', 'Block B', '304', '+91 98765 43210', 'pass123'),
-  ('2024-CSE-001', '730324104001', 'Adhiyamaan Hosteller', 'STUDENT', 'Computer Science & Engineering', 2, 'Section A', 'Pennar Hostel (Boys)', 'Block B', '304', '+91 94421 00001', 'pass123'),
-  ('tutor_cse_a', NULL, 'Prof. M. Priya', 'TUTOR', 'Computer Science & Engineering', NULL, 'Section A', NULL, NULL, NULL, '+91 94421 88101', 'pass123'),
-  ('tutor_cse_b', NULL, 'Prof. K. Ramesh', 'TUTOR', 'Computer Science & Engineering', NULL, 'Section B', NULL, NULL, NULL, '+91 94421 88102', 'pass123'),
-  ('hod_cse', NULL, 'Dr. K. Suresh', 'HOD', 'Computer Science & Engineering', NULL, NULL, NULL, NULL, NULL, '+91 94421 88100', 'pass123'),
-  ('warden_block_b', NULL, 'Prof. M. Arjunan', 'WARDEN', NULL, NULL, NULL, 'Pennar Hostel (Boys)', 'Block B', NULL, '+91 94421 88201', 'pass123'),
-  ('warden_girls', NULL, 'Prof. S. Aarthi', 'WARDEN', NULL, NULL, NULL, 'Bhavani Hostel (Girls)', 'Block A', NULL, '+91 98422 11902', 'pass123'),
-  ('chiefwarden@adhiyamaan.ac.in', NULL, 'Prof. R. Sengottuvelu', 'ADMIN', NULL, NULL, NULL, 'All Campus Hostels', 'All Blocks', NULL, '+91 94421 88001', 'Chief@123'),
-  ('principal@adhiyamaan.ac.in', NULL, 'Dr. G. Ranganath', 'ADMIN', NULL, NULL, NULL, 'Campus Supreme Head', 'Main Admin', NULL, '+91 94421 88000', 'Admin@123'),
-  ('main_security', NULL, 'Officer Vikram', 'SECURITY', NULL, NULL, NULL, 'Main Gate Checkpoint', 'Gate 1', NULL, '+91 94421 88999', 'pass123')
-ON CONFLICT (roll_number) DO NOTHING;
+  ('chiefwarden@adhiyamaan.ac.in', 'Prof. R. Sengottuvelu (Chief Warden)', 'ADMIN', 'Chief@123'),
+  ('principal@adhiyamaan.ac.in', 'Dr. G. Ranganath (Principal)', 'ADMIN', 'Admin@123')
+ON CONFLICT (roll_number) DO UPDATE
+SET password = EXCLUDED.password;
