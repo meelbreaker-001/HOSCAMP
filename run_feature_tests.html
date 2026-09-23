@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/style.css?v=2.6">
+  <link rel="stylesheet" href="css/components.css?v=2.6">
+  <link rel="stylesheet" href="css/dashboard.css?v=2.6">
+  <link rel="stylesheet" href="css/chat.css?v=2.6">
+</head>
+<body>
+  <div id="test_results" style="position:fixed;bottom:0;left:0;background:#000;color:#0f0;padding:10px;z-index:99999;max-height:400px;overflow:auto;"></div>
+
+  <script src="js/supabase-config.js?v=2.9"></script>
+  <script src="js/supabase-client.js?v=2.9"></script>
+  <script src="js/auth.js?v=2.9"></script>
+  <script src="js/storage.js?v=2.9"></script>
+  <script src="js/noticeboard.js?v=2.9"></script>
+  <script src="js/chat.js?v=2.9"></script>
+  <script src="js/student.js?v=2.9"></script>
+  <script src="js/warden.js?v=2.9"></script>
+  <script src="js/academic.js?v=2.9"></script>
+  <script src="js/security.js?v=2.9"></script>
+  <script src="js/admin.js?v=2.9"></script>
+  <script src="js/app.js?v=2.9"></script>
+
+  <script>
+    window.alert = function(msg) { console.log('ALERT:', msg); };
+    window.confirm = function() { return true; };
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'index.html', false);
+    xhr.send(null);
+    const html = xhr.responseText;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    document.body.innerHTML = doc.body.innerHTML + '<div id="test_results" style="position:fixed;bottom:0;left:0;background:#000;color:#0f0;padding:10px;z-index:99999;max-height:400px;overflow:auto;"></div>';
+
+    const logs = [];
+
+        // 1. TEST CHIEF WARDEN LOGIN VIA ROLE DROPDOWN
+        document.getElementById('loginRoleSelect').value = 'CHIEF_WARDEN';
+        document.getElementById('loginUsername').value = 'chiefwarden@adhiyamaan.ac.in';
+        document.getElementById('loginPassword').value = 'ace_cw_2026';
+        handleRealLogin(new Event('submit'));
+
+        let currentUser = getCurrentUser();
+        let dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+        let sidebar = document.getElementById('appSidebar').innerHTML;
+
+        logs.push({
+          test: 'Chief Warden Login via dropdown',
+          role: currentUser.role,
+          name: currentUser.fullName,
+          has_chief_warden_title: dashArea.includes('Supreme Governance Portal') || dashArea.includes('Chief Warden'),
+          sidebar_has_cw: sidebar.includes('Chief Warden'),
+          is_student_dash: dashArea.includes('Welcome back, Alex')
+        });
+
+        handleUserLogout();
+
+        // 2. TEST CHIEF WARDEN LOGIN VIA FUZZY STRING "chief warden" (WITH SPACE)
+        document.getElementById('loginRoleSelect').value = 'STUDENT'; // Left default on student!
+        document.getElementById('loginUsername').value = 'chief warden';
+        document.getElementById('loginPassword').value = 'any';
+        handleRealLogin(new Event('submit'));
+
+        currentUser = getCurrentUser();
+        dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+
+        logs.push({
+          test: 'Chief Warden Login via fuzzy "chief warden"',
+          role: currentUser.role,
+          name: currentUser.fullName,
+          has_cw_dashboard: dashArea.includes('Supreme Governance Portal') || dashArea.includes('Chief Warden'),
+          is_student_dash: dashArea.includes('Welcome back, Alex')
+        });
+
+        handleUserLogout();
+
+        // 3. TEST DEPUTY WARDEN COUNT CARD POPUPS
+        document.getElementById('loginRoleSelect').value = 'WARDEN';
+        document.getElementById('loginUsername').value = 'warden_block_b';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
+        // Test opening pending modal
+        openWardenCountModal('pending');
+        let modal = document.getElementById('wardenCountModal');
+        let modalTitle = document.getElementById('wardenCountModalTitle').innerText;
+        let modalBody = document.getElementById('wardenCountModalBody').innerHTML;
+
+        logs.push({
+          test: 'Warden Count Modal - Pending',
+          modal_active: modal.classList.contains('active'),
+          modal_title: modalTitle,
+          has_extension_badge: modalBody.includes('RETURN EXTENSION'),
+          has_approve_btn: modalBody.includes('Approve')
+        });
+
+        // Test opening outin modal
+        openWardenCountModal('outin');
+        logs.push({
+          test: 'Warden Count Modal - OUT/IN',
+          modal_active: modal.classList.contains('active'),
+          modal_title: document.getElementById('wardenCountModalTitle').innerText,
+          rows_count: document.getElementById('wardenCountModalBody').querySelectorAll('tbody tr').length
+        });
+
+        // Test opening roomstay modal
+        openWardenCountModal('roomstay');
+        logs.push({
+          test: 'Warden Count Modal - Room Stay',
+          modal_active: modal.classList.contains('active'),
+          modal_title: document.getElementById('wardenCountModalTitle').innerText,
+          rows_count: document.getElementById('wardenCountModalBody').querySelectorAll('tbody tr').length
+        });
+
+        // Test opening residents modal
+        openWardenCountModal('residents');
+        logs.push({
+          test: 'Warden Count Modal - Residents',
+          modal_active: modal.classList.contains('active'),
+          modal_title: document.getElementById('wardenCountModalTitle').innerText,
+          rows_count: document.getElementById('wardenCountModalBody').querySelectorAll('tbody tr').length
+        });
+
+        // 4. TEST STUDENT EXTENSION REQUEST & WARDEN APPROVAL
+        closeWardenCountModal();
+        handleUserLogout();
+
+        // Log in as student
+        document.getElementById('loginRoleSelect').value = 'STUDENT';
+        document.getElementById('loginUsername').value = 'alex_student';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
+        // Student submits extension
+        document.getElementById('extendPassId').value = 'PASS-2026-X89B';
+        document.getElementById('extendCurrentEndDate').value = '2026-09-21 18:00';
+        document.getElementById('extendNewEndDate').value = '2026-09-21 21:00';
+        document.getElementById('extendReason').value = 'Delayed campus bus service from Bangalore';
+        handleExtendPassSubmit(new Event('submit'));
+
+        const studentPass = window.sampleOutInPasses.find(p => p.id === 'PASS-2026-X89B');
+        logs.push({
+          test: 'Student Dispatches Return Time Extension',
+          extension_status: studentPass ? studentPass.extensionStatus : null
+        });
+
+        handleUserLogout();
+
+        // Deputy Warden logs in and approves extension
+        document.getElementById('loginRoleSelect').value = 'WARDEN';
+        document.getElementById('loginUsername').value = 'warden_block_b';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
+        // Find the extension in warden queue
+        const ext = sampleWardenPendingPasses.find(p => p.isExtension);
+        let approvedResult = false;
+        if (ext) {
+          approvePassExtension(ext.id);
+          approvedResult = true;
+        }
+
+        const issuedOutIn = sampleWardenIssuedOutInPasses.find(p => p.id === 'PASS-2026-X89B');
+        logs.push({
+          test: 'Warden Approves Extension',
+          ext_found_and_approved: approvedResult,
+          issued_end_date: issuedOutIn ? issuedOutIn.endDate : null,
+          issued_ext_status: issuedOutIn ? issuedOutIn.extensionStatus : null
+        });
+
+        handleUserLogout();
+
+        // 5. TEST HOD CLASS TUTOR MANAGEMENT (ADD, EDIT, DELETE)
+        document.getElementById('loginRoleSelect').value = 'HOD';
+        document.getElementById('loginUsername').value = 'hod_cse';
+        document.getElementById('loginPassword').value = 'ace_cse_2026';
+        handleRealLogin(new Event('submit'));
+
+        // Open Add Tutor Modal
+        openAddTutorModal();
+        document.getElementById('tutorSectionInput').value = 'Section C';
+        document.getElementById('tutorNameInput').value = 'Prof. S. Divya';
+        document.getElementById('tutorUsernameInput').value = 'tutor_cse_c';
+        document.getElementById('tutorPasswordInput').value = 'pass123';
+        document.getElementById('tutorScopeInput').value = 'Years 1, 2, 3, 4 (Section C Hostellers)';
+        handleSaveTutorSubmit(new Event('submit'));
+
+        const addedTutor = window.tutorSectionAllocations.find(t => t.tutorId === 'tutor_cse_c');
+        const addedAccount = window.SYSTEM_ACCOUNTS['tutor_cse_c'];
+
+        logs.push({
+          test: 'HoD Assigns Class Tutor',
+          tutor_found: !!addedTutor,
+          tutor_section: addedTutor ? addedTutor.section : null,
+          system_account_created: !!addedAccount,
+          system_account_role: addedAccount ? addedAccount.role : null
+        });
+
+        // Test HoD Editing Tutor
+        openEditTutorModal('tutor_cse_c');
+        document.getElementById('tutorNameInput').value = 'Dr. S. Divya Ph.D';
+        handleSaveTutorSubmit(new Event('submit'));
+        const editedTutor = window.tutorSectionAllocations.find(t => t.tutorId === 'tutor_cse_c');
+
+        logs.push({
+          test: 'HoD Edits Class Tutor',
+          updated_name: editedTutor ? editedTutor.tutorName : null
+        });
+
+        handleUserLogout();
+
+        // 6. TEST CHIEF WARDEN DEPUTY WARDEN MANAGEMENT (APPOINT, EDIT, RELIEVE)
+        document.getElementById('loginRoleSelect').value = 'CHIEF_WARDEN';
+        document.getElementById('loginUsername').value = 'chiefwarden@adhiyamaan.ac.in';
+        document.getElementById('loginPassword').value = 'ace_cw_2026';
+        handleRealLogin(new Event('submit'));
+
+        // Appoint new Deputy Warden
+        openAddWardenModal();
+        document.getElementById('wardenHostelInput').value = 'Pennar Hostel (Boys)';
+        document.getElementById('wardenBlockInput').value = 'Block C (Freshers)';
+        document.getElementById('wardenNameInput').value = 'Prof. R. Santhosh';
+        document.getElementById('wardenPhoneInput').value = '+91 94433 22110';
+        document.getElementById('wardenUsernameInput').value = 'warden_block_c';
+        document.getElementById('wardenPasswordInput').value = 'pass123';
+        handleSaveDeputyWardenSubmit(new Event('submit'));
+
+        const addedWarden = window.deputyWardenAllocations.find(w => w.wardenId === 'warden_block_c');
+        const addedWardenAccount = window.SYSTEM_ACCOUNTS['warden_block_c'];
+
+        logs.push({
+          test: 'Chief Warden Appoints Deputy Warden',
+          warden_found: !!addedWarden,
+          hostel_block: addedWarden ? addedWarden.hostelBlock : null,
+          account_registered: !!addedWardenAccount,
+          account_role: addedWardenAccount ? addedWardenAccount.role : null
+        });
+
+        // Test Relieve Deputy Warden
+        deleteDeputyWardenAllocation('warden_block_c');
+        const relievedWarden = window.deputyWardenAllocations.find(w => w.wardenId === 'warden_block_c');
+
+        logs.push({
+          test: 'Chief Warden Relieves Deputy Warden',
+          still_present: !!relievedWarden
+        });
+
+        handleUserLogout();
+
+        // 7. TEST LOGIN AS NEWLY CREATED TUTOR
+        document.getElementById('loginRoleSelect').value = 'TUTOR';
+        document.getElementById('loginUsername').value = 'tutor_cse_c';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
+        currentUser = getCurrentUser();
+        dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+
+        logs.push({
+          test: 'Login as Newly Created Tutor',
+          logged_in: !!currentUser,
+          role: currentUser ? currentUser.role : null,
+          name: currentUser ? currentUser.fullName : null,
+          has_tutor_dashboard: dashArea.includes('Class Tutor Portal') || dashArea.includes('Academic Attendance')
+        });
+
+        handleUserLogout();
+
+        // 8. TEST REAL STUDENT SELF-REGISTRATION
+        document.getElementById('regFullName').value = 'Karthikeyan D';
+        document.getElementById('regRollNumber').value = '2024-CSE-099';
+        document.getElementById('regRegisterNumber').value = '730324104099';
+        document.getElementById('regDepartment').value = 'Computer Science & Engineering';
+        document.getElementById('regYear').value = 'II Year (3rd Sem)';
+        document.getElementById('regClassSection').value = 'Section A';
+        document.getElementById('regHostelName').value = 'Pennar Hostel (Boys)';
+        document.getElementById('regRoomNumber').value = '312';
+        document.getElementById('regPhone').value = '+91 94421 99999';
+        document.getElementById('regParentPhone').value = '+91 94421 88888';
+        document.getElementById('regPassword').value = 'mypassword';
+
+        handleStudentRegistrationSubmit(new Event('submit'));
+
+        currentUser = getCurrentUser();
+        dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+        const inRegistry = window.STUDENT_REGISTRY.some(s => s.rollNumber === '2024-CSE-099');
+
+        logs.push({
+          test: 'Student Self-Registration',
+          registered_and_logged_in: !!currentUser,
+          roll_number: currentUser ? currentUser.rollNumber : null,
+          full_name: currentUser ? currentUser.fullName : null,
+          in_student_registry: inRegistry,
+          is_student_dashboard: dashArea.includes('Karthikeyan D') || dashArea.includes('Hostel Student') || dashArea.includes('Quick Actions')
+        });
+
+        handleUserLogout();
+
+        // 9. TEST EVALUATOR QUICK ACCESS (SECURITY OFFICER)
+        quickLoginAs('SECURITY');
+        currentUser = getCurrentUser();
+        dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+
+        logs.push({
+          test: 'Evaluator Instant Login as Security',
+          role: currentUser ? currentUser.role : null,
+          officer_name: currentUser ? currentUser.fullName : null,
+          has_security_scanner: dashArea.includes('Security') || dashArea.includes('Gate Pass Scanner') || dashArea.includes('QR Code')
+        });
+
+        document.getElementById('test_results').innerText = JSON.stringify(logs, null, 2);
+        document.body.setAttribute('data-test-completed', 'true');
+  </script>
+</body>
+</html>
