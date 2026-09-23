@@ -339,12 +339,136 @@ function getCurrentUser() {
 
 function openLoginModal() {
   const modal = document.getElementById('loginModal');
-  if (modal) modal.classList.add('active');
+  if (modal) {
+    modal.classList.add('active');
+    switchAuthTab('signin');
+  }
 }
 
 function closeLoginModal() {
   const modal = document.getElementById('loginModal');
   if (modal) modal.classList.remove('active');
+}
+
+// Authentication Modal Tabs Switcher
+function switchAuthTab(tabName) {
+  const tabs = ['signin', 'register', 'evaluator'];
+  tabs.forEach(t => {
+    const el = document.getElementById('authTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    const btn = document.getElementById('authTabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (el) el.style.display = (t === tabName) ? 'block' : 'none';
+    if (btn) {
+      if (t === tabName) {
+        btn.classList.add('active');
+        btn.style.background = 'rgba(99, 102, 241, 0.4)';
+        btn.style.color = '#FFFFFF';
+        btn.style.border = '1px solid rgba(99, 102, 241, 0.8)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-muted)';
+        btn.style.border = '1px solid transparent';
+      }
+    }
+  });
+}
+
+function openRegisterTabModal() {
+  openLoginModal();
+  switchAuthTab('register');
+}
+
+function openEvaluatorTabModal() {
+  openLoginModal();
+  switchAuthTab('evaluator');
+}
+
+// One-click instant login for evaluators
+function quickLoginAs(roleKey) {
+  quickFillLogin(roleKey);
+  handleRealLogin();
+}
+
+// Student Self-Registration Handler (Saves to Supabase & LocalStorage)
+async function handleStudentRegistrationSubmit(e) {
+  if (e && e.preventDefault) e.preventDefault();
+
+  const fullName = document.getElementById('regFullName')?.value?.trim();
+  const rollNumber = document.getElementById('regRollNumber')?.value?.trim().toUpperCase();
+  const registerNumber = document.getElementById('regRegisterNumber')?.value?.trim();
+  const department = document.getElementById('regDepartment')?.value;
+  const year = document.getElementById('regYear')?.value;
+  const classSection = document.getElementById('regClassSection')?.value;
+  const hostelName = document.getElementById('regHostelName')?.value;
+  const roomNumber = document.getElementById('regRoomNumber')?.value?.trim();
+  const phone = document.getElementById('regPhone')?.value?.trim();
+  const parentContact = document.getElementById('regParentPhone')?.value?.trim();
+  const password = document.getElementById('regPassword')?.value || 'pass123';
+
+  if (!fullName || !rollNumber) {
+    alert('Please provide your Full Name and College Roll Number.');
+    return;
+  }
+
+  // Derive department code & year number
+  let deptCode = 'CSE';
+  if (department.includes('Electronics')) deptCode = 'ECE';
+  else if (department.includes('Information')) deptCode = 'IT';
+  else if (department.includes('Intelligence')) deptCode = 'AIDS';
+  else if (department.includes('Mechanical')) deptCode = 'MECH';
+  else if (department.includes('Biotechnology')) deptCode = 'BT';
+  else if (department.includes('Biomedical')) deptCode = 'BME';
+  else if (department.includes('Civil')) deptCode = 'CIVIL';
+  else if (department.includes('Aeronautical')) deptCode = 'AERO';
+
+  let yearNumber = 1;
+  if (year.includes('II Year')) yearNumber = 2;
+  else if (year.includes('III Year')) yearNumber = 3;
+  else if (year.includes('IV Year')) yearNumber = 4;
+
+  const studentData = {
+    fullName,
+    rollNumber,
+    registerNumber: registerNumber || ('730324' + Math.floor(100000 + Math.random() * 900000)),
+    department,
+    deptCode,
+    year,
+    yearNumber,
+    classSection,
+    hostelName,
+    hostelBlock: hostelName.includes('Pennar') ? 'Block B' : (hostelName.includes('Bhavani') ? 'Block A' : 'Scholars Wing'),
+    roomNumber,
+    phone,
+    parentContact,
+    password
+  };
+
+  const newAccount = {
+    ...studentData,
+    id: 'STD_' + Date.now(),
+    username: studentData.rollNumber,
+    role: 'STUDENT'
+  };
+
+  // Immediate synchronous login for UI
+  loggedInUser = { ...newAccount };
+
+  if (typeof window.registerStudentAccount === 'function') {
+    window.registerStudentAccount(studentData);
+  } else if (window.STUDENT_REGISTRY) {
+    window.STUDENT_REGISTRY.push(newAccount);
+  }
+
+  if (window.saveAppState) {
+    window.saveAppState();
+  }
+
+  alert(`🎉 Resident Registration Successful!\n\nWelcome to Adhiyamaan College Hostel Portal,\n${fullName} (${rollNumber})!\n\nYour profile has been saved. Accessing your dashboard now...`);
+
+  sendSecurityAuditPing('STUDENT_SELF_REGISTER', loggedInUser.rollNumber, `Name: ${fullName} | Hostel: ${hostelName}`);
+
+  closeLoginModal();
+  onUserLoginSuccess();
 }
 
 // Quick-fill login credentials helper
@@ -393,8 +517,16 @@ function handleRealLogin(e) {
   const username = usernameInput ? usernameInput.value.trim() : '';
   const normUser = username.toLowerCase().replace(/[\s\-_@.]/g, '');
 
-  // Direct lookup
+  // Direct lookup in SYSTEM_ACCOUNTS
   let foundUser = SYSTEM_ACCOUNTS[username] || SYSTEM_ACCOUNTS[username.toLowerCase()] || SYSTEM_ACCOUNTS[normUser];
+
+  // Direct lookup in STUDENT_REGISTRY by Roll Number or Register Number
+  if (!foundUser && window.getStudentByRoll) {
+    const studentMatch = window.getStudentByRoll(username) || (window.getStudentByRegister ? window.getStudentByRegister(username) : null);
+    if (studentMatch) {
+      foundUser = { ...studentMatch, role: 'STUDENT', username: studentMatch.rollNumber };
+    }
+  }
 
   if (!foundUser) {
     // Fuzzy matching
@@ -671,6 +803,11 @@ window.ROLES = ROLES;
 window.getCurrentUser = getCurrentUser;
 window.openLoginModal = openLoginModal;
 window.closeLoginModal = closeLoginModal;
+window.switchAuthTab = switchAuthTab;
+window.openRegisterTabModal = openRegisterTabModal;
+window.openEvaluatorTabModal = openEvaluatorTabModal;
+window.quickLoginAs = quickLoginAs;
+window.handleStudentRegistrationSubmit = handleStudentRegistrationSubmit;
 window.quickFillLogin = quickFillLogin;
 window.handleRealLogin = handleRealLogin;
 window.handleUserLogout = handleUserLogout;

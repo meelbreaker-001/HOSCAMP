@@ -247,6 +247,7 @@ function handleLeaveSubmit(e) {
 
   closeApplyLeaveModal();
   if (window.saveAppState) window.saveAppState();
+  if (typeof window.syncPassToCloud === 'function') window.syncPassToCloud(newPass);
   renderDashboard();
   alert(`🎫 OUT / IN PASS APPLICATION SUBMITTED!\n\nYour campus departure pass request has been routed to both Deputy Warden and Class Tutor (${user.classSection || 'Section A'}).\nEither authority can approve first.`);
 }
@@ -339,6 +340,7 @@ function handleRoomStaySubmit(e) {
 
   closeApplyRoomStayModal();
   if (window.saveAppState) window.saveAppState();
+  if (typeof window.syncPassToCloud === 'function') window.syncPassToCloud(newPass);
   renderDashboard();
   alert(`🛏️ ROOM STAY PASS SUBMITTED!\n\nYour room stay request has been routed to both Deputy Warden and Class Tutor (${user.classSection || 'Section A'}).\nEither authority can approve first.`);
 }

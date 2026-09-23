@@ -57,8 +57,10 @@
         <p style="font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
           A unified, high-security digital portal for dual-approval leave passes, real-time grievance tracking with photo proof, 24/7 emergency SOS dispatch, and gate pass security scanning.
         </p>
-        <div style="display: flex; gap: 1rem; justify-content: center;">
-          <button class="btn btn-primary" style="padding: 0.85rem 1.75rem; font-size: 1rem;" onclick="openLoginModal()">Access Portal Login</button>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" style="padding: 0.85rem 1.75rem; font-size: 1rem;" onclick="openLoginModal()">🔑 Access Portal Login</button>
+          <button class="btn btn-secondary" style="padding: 0.85rem 1.5rem; font-size: 1rem; border-color: rgba(99, 102, 241, 0.4);" onclick="openRegisterTabModal()">📝 Student Registration</button>
+          <button class="btn btn-secondary" style="padding: 0.85rem 1.25rem; font-size: 0.95rem; border-color: rgba(16, 185, 129, 0.4);" onclick="openSupabaseSettingsModal()" id="cloudDbStatusBadge">⚡ Cloud DB (Supabase)</button>
         </div>
       </div>
     </section>
@@ -359,40 +361,256 @@
     </div>
   </div>
 
-  <!-- Real User Login Modal -->
+  <!-- Multi-Tab Portal Access & Registration Modal -->
   <div class="modal-overlay" id="loginModal">
-    <div class="modal-card">
+    <div class="modal-card" style="max-width: 560px; width: 95%;">
       <div class="modal-header">
-        <h3 class="modal-title">Portal User Login</h3>
+        <div>
+          <h3 class="modal-title" id="authModalTitle">🏛️ ACE Campus Portal Access</h3>
+          <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0.2rem 0 0 0;">Adhiyamaan College of Engineering (Autonomous)</p>
+        </div>
         <button class="btn-close-modal" onclick="closeLoginModal()">✕</button>
       </div>
 
-      <form onsubmit="handleRealLogin(event)">
-        <div class="form-group">
-          <label class="form-label">Select Your Role</label>
-          <select class="form-control" id="loginRoleSelect" required>
-            <option value="CHIEF_WARDEN">👑 Chief Warden (All Campus Hostels Jurisdiction)</option>
-            <option value="ADMIN">🏛️ Principal / Supreme Head</option>
-            <option value="WARDEN">🛡️ Deputy Warden</option>
-            <option value="STUDENT">🎒 Student</option>
-            <option value="TUTOR">📚 Class Tutor</option>
-            <option value="HOD">🎓 Department HoD</option>
-            <option value="SECURITY">👮 Master Security</option>
-          </select>
-        <div class="form-group">
-          <label class="form-label">Username / Roll No / Official ID</label>
-          <input type="text" class="form-control" id="loginUsername" placeholder="Enter your institutional ID or username" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 700; margin-top: 0.5rem;">
-          Sign In to Dashboard
+      <!-- Tab Switchers -->
+      <div style="display: flex; gap: 0.4rem; background: rgba(15, 23, 42, 0.6); padding: 0.35rem; border-radius: 8px; margin-bottom: 1.25rem; border: 1px solid var(--border-glass);">
+        <button type="button" class="btn btn-secondary active" id="authTabBtnSignIn" onclick="switchAuthTab('signin')" style="flex: 1; padding: 0.5rem 0.25rem; font-size: 0.82rem; font-weight: 700; border: none;">
+          🔑 Sign In
         </button>
-      </form>
+        <button type="button" class="btn btn-secondary" id="authTabBtnRegister" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.5rem 0.25rem; font-size: 0.82rem; font-weight: 700; border: none;">
+          📝 Student Sign-Up
+        </button>
+        <button type="button" class="btn btn-secondary" id="authTabBtnEvaluator" onclick="switchAuthTab('evaluator')" style="flex: 1; padding: 0.5rem 0.25rem; font-size: 0.82rem; font-weight: 700; border: none;">
+          ⚡ Evaluator Demo
+        </button>
+      </div>
+
+      <!-- Tab 1: Standard Sign In -->
+      <div id="authTabSignIn">
+        <form onsubmit="handleRealLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Select Your Role</label>
+            <select class="form-control" id="loginRoleSelect" required>
+              <option value="STUDENT">🎒 Hostel Student</option>
+              <option value="TUTOR">📚 Class Tutor</option>
+              <option value="WARDEN">🛡️ Deputy Warden</option>
+              <option value="HOD">🎓 Department HoD</option>
+              <option value="CHIEF_WARDEN">👑 Chief Warden (All Campus Hostels)</option>
+              <option value="ADMIN">🏛️ Principal / Supreme Head</option>
+              <option value="SECURITY">👮 Master Security</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Username / Roll No / Official ID</label>
+            <input type="text" class="form-control" id="loginUsername" placeholder="e.g. 2024-CSE-001 or alex_student" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 700; margin-top: 0.5rem;">
+            Sign In to Dashboard ➔
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-glass); font-size: 0.82rem; color: var(--text-muted);">
+          New hostel resident?
+          <a href="#" onclick="switchAuthTab('register'); return false;" style="color: #818CF8; font-weight: 600; text-decoration: none;">
+            Register your profile here ➔
+          </a>
+        </div>
+      </div>
+
+      <!-- Tab 2: Student Self-Registration (Sign-Up) -->
+      <div id="authTabRegister" style="display: none;">
+        <form onsubmit="handleStudentRegistrationSubmit(event)">
+          <div style="background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem; font-size: 0.8rem; color: #C7D2FE;">
+            🎓 <b>Resident Student Onboarding:</b> Register your institutional profile for automated pass routing to your Class Tutor and Deputy Warden.
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Full Name (as per College Records) *</label>
+            <input type="text" class="form-control" id="regFullName" placeholder="e.g. Karthikeyan D" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">College Roll Number *</label>
+              <input type="text" class="form-control" id="regRollNumber" placeholder="e.g. 2024-CSE-045" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Anna Univ Register No</label>
+              <input type="text" class="form-control" id="regRegisterNumber" placeholder="e.g. 730324104045">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Academic Department *</label>
+              <select class="form-control" id="regDepartment" required>
+                <option value="Computer Science & Engineering">Computer Science & Engineering (CSE)</option>
+                <option value="Electronics & Communication Engineering">Electronics & Communication (ECE)</option>
+                <option value="Information Technology">Information Technology (IT)</option>
+                <option value="Artificial Intelligence & Data Science">AI & Data Science (AIDS)</option>
+                <option value="Mechanical Engineering">Mechanical Engineering (MECH)</option>
+                <option value="Biotechnology">Biotechnology (BT)</option>
+                <option value="Biomedical Engineering">Biomedical Engineering (BME)</option>
+                <option value="Civil Engineering">Civil Engineering (CIVIL)</option>
+                <option value="Aeronautical Engineering">Aeronautical Engineering (AERO)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Year of Study & Semester *</label>
+              <select class="form-control" id="regYear" required>
+                <option value="I Year (1st Sem)">I Year (1st / 2nd Sem)</option>
+                <option value="II Year (3rd Sem)" selected>II Year (3rd / 4th Sem)</option>
+                <option value="III Year (5th Sem)">III Year (5th / 6th Sem)</option>
+                <option value="IV Year (7th Sem)">IV Year (7th / 8th Sem)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Class Section *</label>
+              <select class="form-control" id="regClassSection" required>
+                <option value="Section A">Section A (Tutor: Prof. M. Priya)</option>
+                <option value="Section B">Section B (Tutor: Prof. K. Ramesh)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Assigned Hostel *</label>
+              <select class="form-control" id="regHostelName" required>
+                <option value="Pennar Hostel (Boys)">🏢 Pennar Hostel (Boys)</option>
+                <option value="Bhavani Hostel (Girls)">🌸 Bhavani Hostel (Girls)</option>
+                <option value="Cauvery Scholar Hostel">🎓 Cauvery Scholar Hostel</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Hostel Block & Room *</label>
+              <input type="text" class="form-control" id="regRoomNumber" placeholder="e.g. Block B, Room 304" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Student Mobile Phone *</label>
+              <input type="tel" class="form-control" id="regPhone" placeholder="e.g. +91 9876543210" required>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Parent / Guardian Phone *</label>
+              <input type="tel" class="form-control" id="regParentPhone" placeholder="e.g. +91 9876500000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Portal Password *</label>
+              <input type="password" class="form-control" id="regPassword" placeholder="Create password" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 700; margin-top: 0.5rem; background: linear-gradient(135deg, #4F46E5, #06B6D4);">
+            🎓 Complete Resident Registration
+          </button>
+        </form>
+      </div>
+
+      <!-- Tab 3: Evaluator Demo Access (One-Click Role Switcher) -->
+      <div id="authTabEvaluator" style="display: none;">
+        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem; font-size: 0.82rem; color: #FDE68A;">
+          ⚡ <b>Evaluator Quick Access:</b> Click any role below to enter the portal immediately without typing passwords.
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <!-- Student -->
+          <div class="stat-card" style="padding: 0.85rem; cursor: pointer; border: 1px solid var(--border-glass);" onclick="quickLoginAs('STUDENT')" title="Click to enter as Student">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">🎒</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main);">Hostel Student</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Alex Rivers (CSE)</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+              Enter as Student ➔
+            </button>
+          </div>
+
+          <!-- Tutor -->
+          <div class="stat-card" style="padding: 0.85rem; cursor: pointer; border: 1px solid var(--border-glass);" onclick="quickLoginAs('TUTOR')" title="Click to enter as Class Tutor">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">📚</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main);">Class Tutor</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Prof. M. Priya (Sec A)</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+              Enter as Tutor ➔
+            </button>
+          </div>
+
+          <!-- Deputy Warden -->
+          <div class="stat-card" style="padding: 0.85rem; cursor: pointer; border: 1px solid var(--border-glass);" onclick="quickLoginAs('WARDEN')" title="Click to enter as Deputy Warden">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">🛡️</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main);">Deputy Warden</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Prof. M. Arjunan (Pennar)</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+              Enter as Warden ➔
+            </button>
+          </div>
+
+          <!-- HoD -->
+          <div class="stat-card" style="padding: 0.85rem; cursor: pointer; border: 1px solid var(--border-glass);" onclick="quickLoginAs('HOD')" title="Click to enter as Department HoD">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">🎓</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main);">Department HoD</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Dr. K. Suresh (HoD CSE)</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+              Enter as HoD ➔
+            </button>
+          </div>
+
+          <!-- Chief Warden -->
+          <div class="stat-card" style="padding: 0.85rem; cursor: pointer; border: 1px solid var(--border-glass);" onclick="quickLoginAs('CHIEF_WARDEN')" title="Click to enter as Chief Warden">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">👑</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main);">Chief Warden</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Prof. R. Sengottuvelu</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+              Enter as Chief Warden ➔
+            </button>
+          </div>
+
+          <!-- Master Security -->
+          <div class="stat-card" style="padding: 0.85rem; cursor: pointer; border: 1px solid var(--border-glass);" onclick="quickLoginAs('SECURITY')" title="Click to enter as Master Security">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">👮</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-main);">Gate Security</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Officer Vikram (Main Gate)</div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; padding: 0.3rem 0.5rem; font-size: 0.75rem;">
+              Enter as Security ➔
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -921,16 +1139,21 @@
     </div>
   </div>
 
+  <!-- Supabase Cloud Database Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js?v=2.9"></script>
+  <script src="js/supabase-client.js?v=2.9"></script>
+
   <!-- Frontend Application Scripts -->
-  <script src="js/auth.js?v=2.8"></script>
-  <script src="js/storage.js?v=2.8"></script>
-  <script src="js/noticeboard.js?v=2.8"></script>
-  <script src="js/chat.js?v=2.8"></script>
-  <script src="js/student.js?v=2.8"></script>
-  <script src="js/warden.js?v=2.8"></script>
-  <script src="js/academic.js?v=2.8"></script>
-  <script src="js/security.js?v=2.8"></script>
-  <script src="js/admin.js?v=2.8"></script>
-  <script src="js/app.js?v=2.8"></script>
+  <script src="js/auth.js?v=2.9"></script>
+  <script src="js/storage.js?v=2.9"></script>
+  <script src="js/noticeboard.js?v=2.9"></script>
+  <script src="js/chat.js?v=2.9"></script>
+  <script src="js/student.js?v=2.9"></script>
+  <script src="js/warden.js?v=2.9"></script>
+  <script src="js/academic.js?v=2.9"></script>
+  <script src="js/security.js?v=2.9"></script>
+  <script src="js/admin.js?v=2.9"></script>
+  <script src="js/app.js?v=2.9"></script>
 </body>
 </html>

@@ -10,16 +10,18 @@
 <body>
   <div id="test_results" style="position:fixed;bottom:0;left:0;background:#000;color:#0f0;padding:10px;z-index:99999;max-height:400px;overflow:auto;"></div>
 
-  <script src="js/auth.js?v=2.8"></script>
-  <script src="js/storage.js?v=2.8"></script>
-  <script src="js/noticeboard.js?v=2.8"></script>
-  <script src="js/chat.js?v=2.8"></script>
-  <script src="js/student.js?v=2.8"></script>
-  <script src="js/warden.js?v=2.8"></script>
-  <script src="js/academic.js?v=2.8"></script>
-  <script src="js/security.js?v=2.8"></script>
-  <script src="js/admin.js?v=2.8"></script>
-  <script src="js/app.js?v=2.8"></script>
+  <script src="js/supabase-config.js?v=2.9"></script>
+  <script src="js/supabase-client.js?v=2.9"></script>
+  <script src="js/auth.js?v=2.9"></script>
+  <script src="js/storage.js?v=2.9"></script>
+  <script src="js/noticeboard.js?v=2.9"></script>
+  <script src="js/chat.js?v=2.9"></script>
+  <script src="js/student.js?v=2.9"></script>
+  <script src="js/warden.js?v=2.9"></script>
+  <script src="js/academic.js?v=2.9"></script>
+  <script src="js/security.js?v=2.9"></script>
+  <script src="js/admin.js?v=2.9"></script>
+  <script src="js/app.js?v=2.9"></script>
 
   <script>
     window.alert = function(msg) { console.log('ALERT:', msg); };
@@ -263,6 +265,50 @@
           role: currentUser ? currentUser.role : null,
           name: currentUser ? currentUser.fullName : null,
           has_tutor_dashboard: dashArea.includes('Class Tutor Portal') || dashArea.includes('Academic Attendance')
+        });
+
+        handleUserLogout();
+
+        // 8. TEST REAL STUDENT SELF-REGISTRATION
+        document.getElementById('regFullName').value = 'Karthikeyan D';
+        document.getElementById('regRollNumber').value = '2024-CSE-099';
+        document.getElementById('regRegisterNumber').value = '730324104099';
+        document.getElementById('regDepartment').value = 'Computer Science & Engineering';
+        document.getElementById('regYear').value = 'II Year (3rd Sem)';
+        document.getElementById('regClassSection').value = 'Section A';
+        document.getElementById('regHostelName').value = 'Pennar Hostel (Boys)';
+        document.getElementById('regRoomNumber').value = '312';
+        document.getElementById('regPhone').value = '+91 94421 99999';
+        document.getElementById('regParentPhone').value = '+91 94421 88888';
+        document.getElementById('regPassword').value = 'mypassword';
+
+        handleStudentRegistrationSubmit(new Event('submit'));
+
+        currentUser = getCurrentUser();
+        dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+        const inRegistry = window.STUDENT_REGISTRY.some(s => s.rollNumber === '2024-CSE-099');
+
+        logs.push({
+          test: 'Student Self-Registration',
+          registered_and_logged_in: !!currentUser,
+          roll_number: currentUser ? currentUser.rollNumber : null,
+          full_name: currentUser ? currentUser.fullName : null,
+          in_student_registry: inRegistry,
+          is_student_dashboard: dashArea.includes('Karthikeyan D') || dashArea.includes('Hostel Student') || dashArea.includes('Quick Actions')
+        });
+
+        handleUserLogout();
+
+        // 9. TEST EVALUATOR QUICK ACCESS (SECURITY OFFICER)
+        quickLoginAs('SECURITY');
+        currentUser = getCurrentUser();
+        dashArea = document.getElementById('dashboardRenderArea').innerHTML;
+
+        logs.push({
+          test: 'Evaluator Instant Login as Security',
+          role: currentUser ? currentUser.role : null,
+          officer_name: currentUser ? currentUser.fullName : null,
+          has_security_scanner: dashArea.includes('Security') || dashArea.includes('Gate Pass Scanner') || dashArea.includes('QR Code')
         });
 
         document.getElementById('test_results').innerText = JSON.stringify(logs, null, 2);
