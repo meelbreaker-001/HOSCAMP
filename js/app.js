@@ -427,6 +427,9 @@ function handleGrievanceSubmit(e) {
     window.sampleStudentGrievances.unshift(newTicket);
   }
 
+  if (window.saveAppState) window.saveAppState();
+  if (typeof window.syncGrievanceToCloud === 'function') window.syncGrievanceToCloud(newTicket);
+
   closeFileGrievanceModal();
   renderDashboard();
   alert(`🔧 GRIEVANCE TICKET CREATED!\n\nTicket ${newTicket.id} filed under ${cat} (${sev} Severity). Deputy Warden notified.`);

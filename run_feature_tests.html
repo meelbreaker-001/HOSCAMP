@@ -10,6 +10,7 @@
 <body>
   <div id="test_results" style="position:fixed;bottom:0;left:0;background:#000;color:#0f0;padding:10px;z-index:99999;max-height:400px;overflow:auto;"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.9"></script>
   <script src="js/supabase-client.js?v=2.9"></script>
   <script src="js/auth.js?v=2.9"></script>
@@ -269,46 +270,58 @@
 
         handleUserLogout();
 
-        // 8. TEST REAL STUDENT SELF-REGISTRATION
-        document.getElementById('regFullName').value = 'Karthikeyan D';
-        document.getElementById('regRollNumber').value = '2024-CSE-099';
-        document.getElementById('regRegisterNumber').value = '730324104099';
-        document.getElementById('regDepartment').value = 'Computer Science & Engineering';
-        document.getElementById('regYear').value = 'II Year (3rd Sem)';
-        document.getElementById('regClassSection').value = 'Section A';
-        document.getElementById('regHostelName').value = 'Pennar Hostel (Boys)';
-        document.getElementById('regRoomNumber').value = '312';
-        document.getElementById('regPhone').value = '+91 94421 99999';
-        document.getElementById('regParentPhone').value = '+91 94421 88888';
-        document.getElementById('regPassword').value = 'mypassword';
+        // 8. TEST REAL STUDENT REGISTRATION & LOGIN
+        if (typeof registerStudentAccount === 'function') {
+          registerStudentAccount({
+            fullName: 'Karthikeyan D',
+            rollNumber: '2024-CSE-099',
+            registerNumber: '730324104099',
+            department: 'Computer Science & Engineering',
+            yearNumber: 2,
+            classSection: 'Section A',
+            hostelName: 'Pennar Hostel (Boys)',
+            hostelBlock: 'Block B',
+            roomNumber: '312',
+            phone: '+91 94421 99999',
+            parentContact: '+91 94421 88888',
+            password: 'mypassword'
+          });
+        }
 
-        handleStudentRegistrationSubmit(new Event('submit'));
+        document.getElementById('loginRoleSelect').value = 'STUDENT';
+        document.getElementById('loginUsername').value = '2024-CSE-099';
+        document.getElementById('loginPassword').value = 'mypassword';
+        handleRealLogin(new Event('submit'));
 
         currentUser = getCurrentUser();
         dashArea = document.getElementById('dashboardRenderArea').innerHTML;
         const inRegistry = window.STUDENT_REGISTRY.some(s => s.rollNumber === '2024-CSE-099');
 
         logs.push({
-          test: 'Student Self-Registration',
+          test: 'Student Self-Registration & Portal Login',
           registered_and_logged_in: !!currentUser,
           roll_number: currentUser ? currentUser.rollNumber : null,
           full_name: currentUser ? currentUser.fullName : null,
           in_student_registry: inRegistry,
-          is_student_dashboard: dashArea.includes('Karthikeyan D') || dashArea.includes('Hostel Student') || dashArea.includes('Quick Actions')
+          is_student_dashboard: dashArea.includes('Karthikeyan D') || dashArea.includes('Hostel Student') || dashArea.includes('Welcome back')
         });
 
         handleUserLogout();
 
-        // 9. TEST EVALUATOR QUICK ACCESS (SECURITY OFFICER)
-        quickLoginAs('SECURITY');
+        // 9. TEST SECURITY OFFICER LOGIN
+        document.getElementById('loginRoleSelect').value = 'SECURITY';
+        document.getElementById('loginUsername').value = 'main_security';
+        document.getElementById('loginPassword').value = 'pass123';
+        handleRealLogin(new Event('submit'));
+
         currentUser = getCurrentUser();
         dashArea = document.getElementById('dashboardRenderArea').innerHTML;
 
         logs.push({
-          test: 'Evaluator Instant Login as Security',
+          test: 'Security Officer Login',
           role: currentUser ? currentUser.role : null,
           officer_name: currentUser ? currentUser.fullName : null,
-          has_security_scanner: dashArea.includes('Security') || dashArea.includes('Gate Pass Scanner') || dashArea.includes('QR Code')
+          has_security_scanner: dashArea.includes('Security') || dashArea.includes('Gate Pass Scanner') || dashArea.includes('QR Code') || dashArea.includes('Gate Checkpoint')
         });
 
         document.getElementById('test_results').innerText = JSON.stringify(logs, null, 2);
